@@ -45,7 +45,12 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 	tc := oauth2.NewClient(ctx, ts)
 	c, err := NewClient(baseURL, tc)
 	if err != nil {
-		return nil, diag.FromErr(err)
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary: "Unable to create TrueNAS API client",
+			Detail: err.Error(),
+		})
+		return nil, diags
 	}
 
 	return c, diags

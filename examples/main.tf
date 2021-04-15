@@ -12,5 +12,5 @@ provider "truenas" {}
 data "truenas_pools" "all" {}
 
 output "all_pools" {
-  value = data.truenas_pools.all.pools
+  value = data.truenas_pools.all.ids
 }

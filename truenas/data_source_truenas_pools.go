@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"log"
 	"strconv"
 	"time"
 )
@@ -12,25 +13,10 @@ func dataSourceTrueNASPools() *schema.Resource {
 	return &schema.Resource{
 		ReadContext: dataSourceTrueNASPoolsRead,
 		Schema: map[string]*schema.Schema{
-			"pools": &schema.Schema{
-				Type:     schema.TypeList,
+			"ids": {
+				Type:     schema.TypeSet,
 				Computed: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"id": &schema.Schema{
-							Type:     schema.TypeInt,
-							Computed: true,
-						},
-						"name": &schema.Schema{
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"path": &schema.Schema{
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-					},
-				},
+				Elem:     &schema.Schema{Type: schema.TypeInt},
 			},
 		},
 	}
@@ -48,34 +34,27 @@ func dataSourceTrueNASPoolsRead(ctx context.Context, d *schema.ResourceData, met
 		return diag.FromErr(err)
 	}
 
-	converted := convertPools(pools)
+	log.Printf("[DEBUG] Received TrueNAS pools: %+q", pools)
 
-	if err := d.Set("pools", converted); err != nil {
+	converted := flattenPoolsResponse(pools)
+
+	if err := d.Set("ids", converted); err != nil {
 		return diag.FromErr(err)
 	}
 
 	// always run
+	// TODO: not sure yet what should go here, find out
 	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
 
 	return diags
 }
 
-func convertPools(pools []*Pool) []interface{} {
-	if pools != nil {
-		result := make([]interface{}, len(pools), len(pools))
+func flattenPoolsResponse(pools []Pool) []int64 {
+	result := make([]int64, len(pools))
 
-		for i, pool := range pools {
-			p := make(map[string]interface{})
-
-			p["id"] = *pool.ID
-			p["name"] = *pool.Name
-			p["path"] = *pool.Path
-
-			result[i] = p
-		}
-
-		return result
+	for i, pool := range pools {
+		result[i] = pool.ID
 	}
 
-	return make([]interface{}, 0)
+	return result
 }
