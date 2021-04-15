@@ -1,6 +1,10 @@
 package truenas
 
-import "context"
+import (
+	"context"
+	"fmt"
+	"net/url"
+)
 
 // PoolService handles communication with the dataset related
 // methods of the TrueNAS API.
@@ -64,7 +68,7 @@ type DatasetResponse struct {
 	Locked                bool            `json:"locked"`
 }
 
-func (s *DatasetService) CreateDataset(ctx context.Context, dataset *CreateDatasetInput) (*DatasetResponse, error) {
+func (s *DatasetService) Create(ctx context.Context, dataset *CreateDatasetInput) (*DatasetResponse, error) {
 	path := "pool/dataset"
 
 	body := struct {
@@ -90,4 +94,33 @@ func (s *DatasetService) CreateDataset(ctx context.Context, dataset *CreateDatas
 	}
 
 	return &d, nil
+}
+
+func (s *DatasetService) Get(ctx context.Context, id string) (*DatasetResponse, error) {
+	path := fmt.Sprintf("pool/dataset/id/%s", url.QueryEscape(id))
+	req, err := s.client.NewRequest("GET", path, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	dataset := &DatasetResponse{}
+
+	_, err = s.client.Do(ctx, req, dataset)
+	if err != nil {
+		return nil, err
+	}
+
+	return dataset, nil
+}
+
+func (s *DatasetService) Delete(ctx context.Context, id string) error {
+	path := fmt.Sprintf("pool/dataset/id/%s", url.QueryEscape(id))
+
+	req, err := s.client.NewRequest("DELETE", path, nil)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.client.Do(ctx, req, nil)
+	return err
 }

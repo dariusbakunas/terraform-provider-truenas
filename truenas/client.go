@@ -71,7 +71,7 @@ type Client struct {
 	UserAgent string
 
 	// Services used for talking to different parts of the TrueNAS API.
-	Pools *PoolService
+	Pools    *PoolService
 	Datasets *DatasetService
 }
 
