@@ -22,11 +22,11 @@ func newDatasetPath(id string) datasetPath {
 
 	if len(s) == 2 {
 		// there is no Parent
-		return datasetPath{ Pool: s[0], Name: s[1], Parent: "" }
+		return datasetPath{Pool: s[0], Name: s[1], Parent: ""}
 	}
 
 	// first element is Pool Name, last - dataset Name and in-between - Parent
-	return datasetPath{ Pool: s[0], Name: s[len(s) - 1], Parent: strings.Join(s[1:len(s) - 1], "/")}
+	return datasetPath{Pool: s[0], Name: s[len(s)-1], Parent: strings.Join(s[1:len(s)-1], "/")}
 }
 
 func (d datasetPath) String() string {
@@ -90,7 +90,8 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 
 	d.SetId(resp.ID)
 
-	return diags
+	// TODO: is this common practice? or should it just return empty diags
+	return append(diags, resourceTrueNASDatasetRead(ctx, d, m)...)
 }
 
 func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -124,8 +125,7 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 		return diag.Errorf("error setting Name: %s", err)
 	}
 
-	// TODO: is this common practice? or should it just return empty diags
-	return append(diags, resourceTrueNASDatasetRead(ctx, d, m)...)
+	return diags
 }
 
 func resourceTrueNASDatasetUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {

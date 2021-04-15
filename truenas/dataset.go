@@ -28,7 +28,7 @@ type CompositeValue struct {
 	Value    *string `json:"value"`
 	RawValue string  `json:"rawvalue"`
 	//Parsed   string  `json:"parsed"` // looks like TrueNAS mixes types for this property: bool/string/number?
-	Source   string  `json:"source"`
+	Source string `json:"source"`
 }
 
 type DatasetResponse struct {
