@@ -12,19 +12,21 @@ func Provider() *schema.Provider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
 			"api_key": {
-				Type:     schema.TypeString,
+				Type:        schema.TypeString,
 				Description: "TrueNAS API key",
-				Required: true,
+				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("TRUENAS_API_KEY", nil),
 			},
 			"base_url": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
 				Description: "TrueNAS API base URL, eg. https://your.nas/api/v2.0",
 				DefaultFunc: schema.EnvDefaultFunc("TRUENAS_BASE_URL", nil),
 			},
 		},
-		ResourcesMap: map[string]*schema.Resource{},
+		ResourcesMap: map[string]*schema.Resource{
+			"truenas_dataset": resourceTrueNASDataset(),
+		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"truenas_pools": dataSourceTrueNASPools(),
 		},
@@ -47,8 +49,8 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary: "Unable to create TrueNAS API client",
-			Detail: err.Error(),
+			Summary:  "Unable to create TrueNAS API client",
+			Detail:   err.Error(),
 		})
 		return nil, diags
 	}
