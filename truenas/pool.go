@@ -2,7 +2,6 @@ package truenas
 
 import (
 	"context"
-	"net/http"
 )
 
 // PoolService handles communication with the pool related
@@ -15,24 +14,24 @@ type Pool struct {
 	Path string `json:"path,omitempty"`
 }
 
-func (s *PoolService) List(ctx context.Context, opts *ListOptions) ([]Pool, *http.Response, error) {
+func (s *PoolService) List(ctx context.Context, opts *ListOptions) ([]Pool, error) {
 	path := "pool"
 
 	path, err := addOptions(path, opts)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	req, err := s.client.NewRequest("GET", path, nil)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	var pools []Pool
-	resp, err := s.client.Do(ctx, req, &pools)
+	_, err = s.client.Do(ctx, req, &pools)
 	if err != nil {
-		return nil, resp, err
+		return nil, err
 	}
 
-	return pools, resp, nil
+	return pools, nil
 }

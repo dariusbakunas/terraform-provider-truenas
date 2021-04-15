@@ -22,13 +22,13 @@ func dataSourceTrueNASPools() *schema.Resource {
 	}
 }
 
-func dataSourceTrueNASPoolsRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	c := meta.(*Client)
+func dataSourceTrueNASPoolsRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	c := m.(*Client)
 
 	// Warning or errors can be collected in a slice type
 	var diags diag.Diagnostics
 
-	pools, _, err := c.Pools.List(ctx, &ListOptions{})
+	pools, err := c.Pools.List(ctx, &ListOptions{})
 
 	if err != nil {
 		return diag.FromErr(err)
