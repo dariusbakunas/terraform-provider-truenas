@@ -27,7 +27,7 @@ type CreateDatasetInput struct {
 type CompositeValue struct {
 	Value    *string `json:"value"`
 	RawValue string  `json:"rawvalue"`
-	Parsed   string  `json:"parsed"`
+	//Parsed   string  `json:"parsed"` // looks like TrueNAS mixes types for this property: bool/string/number?
 	Source   string  `json:"source"`
 }
 
@@ -85,7 +85,7 @@ func (s *DatasetService) Create(ctx context.Context, dataset *CreateDatasetInput
 		return nil, err
 	}
 
-	d := DatasetResponse{}
+	d := &DatasetResponse{}
 
 	_, err = s.client.Do(ctx, req, d)
 
@@ -93,7 +93,7 @@ func (s *DatasetService) Create(ctx context.Context, dataset *CreateDatasetInput
 		return nil, err
 	}
 
-	return &d, nil
+	return d, nil
 }
 
 func (s *DatasetService) Get(ctx context.Context, id string) (*DatasetResponse, error) {
