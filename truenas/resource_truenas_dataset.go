@@ -48,17 +48,17 @@ func resourceTrueNASDataset() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"Pool": &schema.Schema{
+			"pool": &schema.Schema{
 				Type:         schema.TypeString,
 				Required:     true,
 				ValidateFunc: validation.StringDoesNotContainAny("/"),
 			},
-			"Parent": &schema.Schema{
+			"parent": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "",
 			},
-			"Name": &schema.Schema{
+			"name": &schema.Schema{
 				Type:         schema.TypeString,
 				Required:     true,
 				ValidateFunc: validation.StringDoesNotContainAny("/"),
@@ -73,9 +73,9 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 	c := m.(*Client)
 
 	name := datasetPath{
-		Pool:   d.Get("Pool").(string),
-		Parent: d.Get("Parent").(string),
-		Name:   d.Get("Name").(string),
+		Pool:   d.Get("pool").(string),
+		Parent: d.Get("parent").(string),
+		Name:   d.Get("name").(string),
 	}
 
 	input := &CreateDatasetInput{
@@ -112,15 +112,15 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 		return diag.Errorf("error setting id: %s", err)
 	}
 
-	if err := d.Set("Pool", dpath.Pool); err != nil {
+	if err := d.Set("pool", dpath.Pool); err != nil {
 		return diag.Errorf("error setting Pool: %s", err)
 	}
 
-	if err := d.Set("Parent", dpath.Parent); err != nil {
+	if err := d.Set("parent", dpath.Parent); err != nil {
 		return diag.Errorf("error setting parent: %s", err)
 	}
 
-	if err := d.Set("Name", dpath.Name); err != nil {
+	if err := d.Set("name", dpath.Name); err != nil {
 		return diag.Errorf("error setting Name: %s", err)
 	}
 
