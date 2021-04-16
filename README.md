@@ -5,3 +5,11 @@
 # Terraform Provider for TrueNAS
 
 Still in early development, check `examples` folder for working examples
+
+## Development
+
+### Requirements
+
+- [Terraform](https://www.terraform.io/downloads.html) 0.15.0+ (to run acceptance tests)
+- [Go](https://golang.org/doc/install) 1.15.8+ (to build the provider plugin)
+

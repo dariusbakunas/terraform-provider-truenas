@@ -1,9 +1,45 @@
 package truenas
 
 import (
+	"context"
+	"fmt"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
+
+func TestAccTruenasDataset_basic(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		CheckDestroy: testAccCheckTruenasDatasetDestroy,
+		Steps: []resource.TestStep{},
+	})
+}
+
+func testAccCheckTruenasDatasetDestroy(s *terraform.State) error {
+	client := testAccProvider.Meta().(*Client)
+
+	// loop through the resources in state, verifying each widget
+	// is destroyed
+	for _, rs := range s.RootModule().Resources {
+		if rs.Type != "truenas_dataset" {
+			continue
+		}
+
+		// Try to find the dataset
+		_, err := client.Datasets.Get(context.Background(), rs.Primary.ID)
+
+		if err == nil {
+			return fmt.Errorf("dataset (%s) still exists", rs.Primary.ID)
+		}
+
+		// TODO: check if error is in fact 404
+	}
+
+	return nil
+}
 
 func Test_datasetPathString(t *testing.T) {
 	testcases := []struct {
