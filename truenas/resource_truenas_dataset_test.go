@@ -3,6 +3,7 @@ package truenas
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/stretchr/testify/assert"
@@ -10,11 +11,24 @@ import (
 )
 
 func TestAccTruenasDataset_basic(t *testing.T) {
+	var dataset DatasetResponse
+	pool := "Tank"
+	suffix := acctest.RandStringFromCharSet(5, acctest.CharSetAlphaNum)
+	name := fmt.Sprintf("tf-acc-test-%s", suffix)
+	resourceName := "truenas_dataset.test"
+
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		CheckDestroy: testAccCheckTruenasDatasetDestroy,
-		Steps: []resource.TestStep{},
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCheckTruenasDatasetResource(pool, name),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckTruenasDatasetResourceExists(resourceName, &dataset),
+				),
+			},
+		},
 	})
 }
 
@@ -72,5 +86,42 @@ func Test_newDatasetPath(t *testing.T) {
 	for _, c := range testcases {
 		actual := newDatasetPath(c.path)
 		assert.Equal(t, actual, c.expected)
+	}
+}
+
+func testAccCheckTruenasDatasetResource(pool string, name string) string {
+	return fmt.Sprintf(`
+	resource "truenas_dataset" "test" {
+		name = "%s"
+		pool = "%s"
+	}
+	`, name, pool)
+}
+
+func testAccCheckTruenasDatasetResourceExists(n string, dataset *DatasetResponse) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		rs, ok := s.RootModule().Resources[n]
+		if !ok {
+			return fmt.Errorf("Not found: %s", n)
+		}
+
+		if rs.Primary.ID == "" {
+			return fmt.Errorf("No dataset ID is set")
+		}
+
+		client := testAccProvider.Meta().(*Client)
+
+		resp, err := client.Datasets.Get(context.Background(), rs.Primary.ID)
+
+		if err != nil {
+			return err
+		}
+
+		if resp.ID != rs.Primary.ID {
+			return fmt.Errorf("Dataset not found")
+		}
+
+		*dataset = *resp
+		return nil
 	}
 }
