@@ -20,6 +20,7 @@ type datasetPath struct {
 }
 
 var supportedCompression = []string{"off", "lz4", "gzip", "gzip-1", "gzip-9", "zstd", "zstd-fast", "zle", "lzjb", "zstd-1", "zstd-2", "zstd-3", "zstd-4", "zstd-5", "zstd-6", "zstd-7", "zstd-8", "zstd-9", "zstd-10", "zstd-11", "zstd-12", "zstd-13", "zstd-14", "zstd-15", "zstd-16", "zstd-17", "zstd-18", "zstd-19", "zstd-fast-1", "zstd-fast-2", "zstd-fast-3", "zstd-fast-4", "zstd-fast-5", "zstd-fast-6", "zstd-fast-7", "zstd-fast-8", "zstd-fast-9", "zstd-fast-10", "zstd-fast-20", "zstd-fast-30", "zstd-fast-40", "zstd-fast-50", "zstd-fast-60", "zstd-fast-70", "zstd-fast-80", "zstd-fast-90", "zstd-fast-100", "zstd-fast-500", "zstd-fast-1000"}
+var recordSizes = []string{"512", "1K", "2K", "4K", "8K", "16K", "32K", "64K", "128K", "256K", "512K", "1024K"}
 
 // newDatasetPath creates new datasetPath struct
 // from TrueNAS dataset ID string, that comes in format: Pool/Parent/dataset_name
@@ -111,6 +112,12 @@ func resourceTrueNASDataset() *schema.Resource {
 				Computed:     true,
 				ValidateFunc: validation.StringInSlice([]string{"on", "off"}, false),
 			},
+			"record_size": &schema.Schema{
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice(recordSizes, false),
+			},
 			"sync": &schema.Schema{
 				Type:         schema.TypeString,
 				Description:  "'standard' uses the sync settings that have been requested by the client software, 'always' waits for data writes to complete, and 'disabled' never waits for writes to complete.",
@@ -175,8 +182,12 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 		input.ATime = strings.ToUpper(atime.(string))
 	}
 
-	if snapdir, ok := d.GetOk("snap_dir"); ok {
-		input.SnapDir = strings.ToUpper(snapdir.(string))
+	if recordSize, ok := d.GetOk("record_size"); ok {
+		input.RecordSize = strings.ToUpper(recordSize.(string))
+	}
+
+	if snapDir, ok := d.GetOk("snap_dir"); ok {
+		input.SnapDir = strings.ToUpper(snapDir.(string))
 	}
 
 	input.Type = datasetType
@@ -274,6 +285,12 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 
 		if err := d.Set("copies", copies); err != nil {
 			return diag.Errorf("error setting copies: %s", err)
+		}
+	}
+
+	if resp.Recordsize != nil {
+		if err := d.Set("record_size", *resp.Recordsize.Value); err != nil {
+			return diag.Errorf("error setting record_size: %s", err)
 		}
 	}
 

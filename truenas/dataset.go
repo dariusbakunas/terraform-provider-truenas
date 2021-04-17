@@ -22,6 +22,7 @@ type CreateDatasetInput struct {
 	Exec              string `json:"exec,omitempty"`
 	InheritEncryption *bool  `json:"inherit_encryption,omitempty"`
 	Quota             *int64 `json:"quota,omitempty"`
+	RecordSize        string `json:"recordsize,omitempty"`
 	RefQuota          *int64 `json:"refquota,omitempty"`
 	RefReservation    *int64 `json:"refreservation,omitempty"`
 	Reservation       *int64 `json:"reservation,omitempty"`
