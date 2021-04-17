@@ -17,4 +17,5 @@ resource "truenas_dataset" "test" {
   compression = "off"
   sync = "standard"
   atime = "off"
+  copies = 2
 }

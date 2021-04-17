@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+	"strconv"
 	"strings"
 )
 
@@ -89,6 +90,12 @@ func resourceTrueNASDataset() *schema.Resource {
 				Computed:     true,
 				ValidateFunc: validation.StringInSlice(supportedCompression, false),
 			},
+			"copies": &schema.Schema {
+				Type: schema.TypeInt,
+				Optional: true,
+				Computed: true,
+				ValidateFunc: validation.IntBetween(1,3),
+			},
 			"sync": &schema.Schema{
 				Type:         schema.TypeString,
 				Description:  "'standard' uses the sync settings that have been requested by the client software, 'always' waits for data writes to complete, and 'disabled' never waits for writes to complete.",
@@ -125,6 +132,10 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 
 	if compression, ok := d.GetOk("compression"); ok {
 		input.Compression = strings.ToUpper(compression.(string))
+	}
+
+	if copies, ok := d.GetOk("copies"); ok {
+		input.Copies = copies.(int)
 	}
 
 	if aclmode, ok := d.GetOk("aclmode"); ok {
@@ -200,6 +211,18 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 	if resp.Compression != nil {
 		if err := d.Set("compression", strings.ToLower(*resp.Compression.Value)); err != nil {
 			return diag.Errorf("error setting compression: %s", err)
+		}
+	}
+
+	if resp.Copies != nil {
+		copies, err := strconv.Atoi(*resp.Copies.Value)
+
+		if err != nil {
+			return diag.Errorf("error parsing copies: %s", err)
+		}
+
+		if err := d.Set("copies", copies); err != nil {
+			return diag.Errorf("error setting copies: %s", err)
 		}
 	}
 

@@ -17,7 +17,7 @@ type CreateDatasetInput struct {
 	Comments          string `json:"comments,omitempty"`
 	Compression       string `json:"compression,omitempty"`
 	CaseSensitivity   string `json:"casesensitivity,omitempty"`
-	Copies            *int8  `json:"copies,omitempty"`
+	Copies            int  `json:"copies,omitempty"`
 	InheritEncryption *bool  `json:"inherit_encryption,omitempty"`
 	Quota             *int64 `json:"quota,omitempty"`
 	RefQuota          *int64 `json:"refquota,omitempty"`
