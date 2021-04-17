@@ -118,6 +118,12 @@ func resourceTrueNASDataset() *schema.Resource {
 				Computed:     true,
 				ValidateFunc: validation.StringInSlice(recordSizes, false),
 			},
+			"share_type": &schema.Schema{
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"generic", "smb"}, false),
+			},
 			"sync": &schema.Schema{
 				Type:         schema.TypeString,
 				Description:  "'standard' uses the sync settings that have been requested by the client software, 'always' waits for data writes to complete, and 'disabled' never waits for writes to complete.",
@@ -184,6 +190,10 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 
 	if recordSize, ok := d.GetOk("record_size"); ok {
 		input.RecordSize = strings.ToUpper(recordSize.(string))
+	}
+
+	if shareType, ok := d.GetOk("share_type"); ok {
+		input.ShareType = strings.ToUpper(shareType.(string))
 	}
 
 	if snapDir, ok := d.GetOk("snap_dir"); ok {
@@ -291,6 +301,12 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 	if resp.Recordsize != nil {
 		if err := d.Set("record_size", *resp.Recordsize.Value); err != nil {
 			return diag.Errorf("error setting record_size: %s", err)
+		}
+	}
+
+	if resp.ShareType != nil {
+		if err := d.Set("share_type", strings.ToLower(*resp.ShareType.Value)); err != nil {
+			return diag.Errorf("error setting share_type: %s", err)
 		}
 	}
 

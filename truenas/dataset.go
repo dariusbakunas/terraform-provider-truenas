@@ -67,6 +67,7 @@ type DatasetResponse struct {
 	RefReservation        *CompositeValue `json:"refreservation"`
 	Copies                *CompositeValue `json:"copies"`
 	SnapDir               *CompositeValue `json:"snapdir"`
+	ShareType             *CompositeValue `json:"sharetype"`
 	Readonly              *CompositeValue `json:"readonly"`
 	Recordsize            *CompositeValue `json:"recordsize"`
 	KeyFormat             *CompositeValue `json:"key_format"`

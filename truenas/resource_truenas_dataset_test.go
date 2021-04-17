@@ -102,11 +102,11 @@ func testAccCheckTruenasDatasetResourceExists(n string, dataset *DatasetResponse
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("Dataset resource not found: %s", n)
+			return fmt.Errorf("dataset resource not found: %s", n)
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("No dataset ID is set")
+			return fmt.Errorf("no dataset ID is set")
 		}
 
 		client := testAccProvider.Meta().(*Client)
@@ -118,7 +118,7 @@ func testAccCheckTruenasDatasetResourceExists(n string, dataset *DatasetResponse
 		}
 
 		if resp.ID != rs.Primary.ID {
-			return fmt.Errorf("Dataset not found")
+			return fmt.Errorf("dataset not found")
 		}
 
 		*dataset = *resp
