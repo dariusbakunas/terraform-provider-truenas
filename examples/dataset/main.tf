@@ -19,4 +19,5 @@ resource "truenas_dataset" "test" {
   atime = "off"
   copies = 2
   deduplication = "off"
+  exec = "on"
 }

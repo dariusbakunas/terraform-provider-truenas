@@ -105,6 +105,12 @@ func resourceTrueNASDataset() *schema.Resource {
 				Computed:     true,
 				ValidateFunc: validation.IntBetween(1, 3),
 			},
+			"exec": &schema.Schema{
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"on", "off"}, false),
+			},
 			"sync": &schema.Schema{
 				Type:         schema.TypeString,
 				Description:  "'standard' uses the sync settings that have been requested by the client software, 'always' waits for data writes to complete, and 'disabled' never waits for writes to complete.",
@@ -149,6 +155,10 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 
 	if copies, ok := d.GetOk("copies"); ok {
 		input.Copies = copies.(int)
+	}
+
+	if exec, ok := d.GetOk("exec"); ok {
+		input.Exec = strings.ToUpper(exec.(string))
 	}
 
 	if aclmode, ok := d.GetOk("aclmode"); ok {
@@ -236,6 +246,12 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 	if resp.Deduplication != nil {
 		if err := d.Set("deduplication", strings.ToLower(*resp.Deduplication.Value)); err != nil {
 			return diag.Errorf("error setting deduplication: %s", err)
+		}
+	}
+
+	if resp.Exec != nil {
+		if err := d.Set("exec", strings.ToLower(*resp.Exec.Value)); err != nil {
+			return diag.Errorf("error setting exec: %s", err)
 		}
 	}
 

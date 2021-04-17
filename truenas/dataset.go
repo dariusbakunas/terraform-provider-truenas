@@ -19,6 +19,7 @@ type CreateDatasetInput struct {
 	CaseSensitivity   string `json:"casesensitivity,omitempty"`
 	Copies            int    `json:"copies,omitempty"`
 	Deduplication     string `json:"deduplication,omitempty"`
+	Exec              string `json:"exec,omitempty"`
 	InheritEncryption *bool  `json:"inherit_encryption,omitempty"`
 	Quota             *int64 `json:"quota,omitempty"`
 	RefQuota          *int64 `json:"refquota,omitempty"`
@@ -26,7 +27,7 @@ type CreateDatasetInput struct {
 	Reservation       *int64 `json:"reservation,omitempty"`
 	ShareType         string `json:"share_type,omitempty"`
 	Sync              string `json:"sync,omitempty"`
-	Type string `json:"type"`
+	Type              string `json:"type"`
 }
 
 // CompositeValue composite value type that most TrueNAS seem to be using
