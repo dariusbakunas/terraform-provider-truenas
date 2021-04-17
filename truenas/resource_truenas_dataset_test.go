@@ -18,8 +18,8 @@ func TestAccTruenasDataset_basic(t *testing.T) {
 	resourceName := "truenas_dataset.test"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck: func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckTruenasDatasetDestroy,
 		Steps: []resource.TestStep{
 			{
@@ -102,7 +102,7 @@ func testAccCheckTruenasDatasetResourceExists(n string, dataset *DatasetResponse
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("Not found: %s", n)
+			return fmt.Errorf("Dataset resource not found: %s", n)
 		}
 
 		if rs.Primary.ID == "" {

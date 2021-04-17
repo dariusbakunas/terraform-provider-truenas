@@ -11,16 +11,18 @@ import (
 type DatasetService service
 
 type CreateDatasetInput struct {
-	ACLMode           *string `json:"aclmode,omitempty"`
-	Name              string  `json:"name"`
-	CaseSensitivity   *string `json:"casesensitivity,omitempty"`
-	Copies            *int8   `json:"copies,omitempty"`
-	InheritEncryption *bool   `json:"inherit_encryption,omitempty"`
-	Quota             *int64  `json:"quota,omitempty"`
-	RefQuota          *int64  `json:"refquota,omitempty"`
-	RefReservation    *int64  `json:"refreservation,omitempty"`
-	Reservation       *int64  `json:"reservation,omitempty"`
-	ShareType         *string `json:"share_type,omitempty"`
+	ACLMode           string `json:"aclmode,omitempty"`
+	Name              string `json:"name"`
+	Comments          string `json:"comments,omitempty"`
+	CaseSensitivity   string `json:"casesensitivity,omitempty"`
+	Copies            *int8  `json:"copies,omitempty"`
+	InheritEncryption *bool  `json:"inherit_encryption,omitempty"`
+	Quota             *int64 `json:"quota,omitempty"`
+	RefQuota          *int64 `json:"refquota,omitempty"`
+	RefReservation    *int64 `json:"refreservation,omitempty"`
+	Reservation       *int64 `json:"reservation,omitempty"`
+	ShareType         string `json:"share_type,omitempty"`
+	Sync              string `json:"sync,omitempty"`
 }
 
 // CompositeValue composite value type that most TrueNAS seem to be using
@@ -34,6 +36,7 @@ type CompositeValue struct {
 type DatasetResponse struct {
 	ID                    string          `json:"id"`
 	Name                  string          `json:"name"`
+	Comments              *CompositeValue `json:"comments"`
 	Pool                  string          `json:"pool"`
 	Type                  string          `json:"type"`
 	Mountpoint            string          `json:"mountpoint"`

@@ -63,6 +63,17 @@ func resourceTrueNASDataset() *schema.Resource {
 				Required:     true,
 				ValidateFunc: validation.StringDoesNotContainAny("/"),
 			},
+			"comments": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"sync": &schema.Schema{
+				Type:         schema.TypeString,
+				Description:  "'standard' uses the sync settings that have been requested by the client software, 'always' waits for data writes to complete, and 'disabled' never waits for writes to complete.",
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"standard", "always", "disabled", "inherit"}, false),
+			},
 		},
 	}
 }
@@ -80,6 +91,14 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 
 	input := &CreateDatasetInput{
 		Name: name.String(),
+	}
+
+	if sync, ok := d.GetOk("sync"); ok {
+		input.Sync = strings.ToUpper(sync.(string))
+	}
+
+	if comments, ok := d.GetOk("comments"); ok {
+		input.Comments = comments.(string)
 	}
 
 	resp, err := c.Datasets.Create(ctx, input)
@@ -114,7 +133,7 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 	}
 
 	if err := d.Set("pool", dpath.Pool); err != nil {
-		return diag.Errorf("error setting Pool: %s", err)
+		return diag.Errorf("error setting pool: %s", err)
 	}
 
 	if err := d.Set("parent", dpath.Parent); err != nil {
@@ -122,7 +141,19 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 	}
 
 	if err := d.Set("name", dpath.Name); err != nil {
-		return diag.Errorf("error setting Name: %s", err)
+		return diag.Errorf("error setting name: %s", err)
+	}
+
+	if resp.Comments != nil {
+		if err := d.Set("comments", resp.Comments.Value); err != nil {
+			return diag.Errorf("error setting comments: %s", err)
+		}
+	}
+
+	if resp.Sync != nil {
+		if err := d.Set("sync", strings.ToLower(*resp.Sync.Value)); err != nil {
+			return diag.Errorf("error setting sync: %s", err)
+		}
 	}
 
 	return diags

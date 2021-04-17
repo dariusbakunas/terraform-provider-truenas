@@ -13,4 +13,6 @@ resource "truenas_dataset" "test" {
   pool = var.dataset_pool
   name = var.dataset_name
   parent = var.dataset_parent
+  comments = "Terraform created dataset"
+  sync = "standard"
 }
