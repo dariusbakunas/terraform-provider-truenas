@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
+	"log"
 	"strconv"
 	"strings"
 )
@@ -156,6 +157,8 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 		input.ATime = strings.ToUpper(atime.(string))
 	}
 
+	log.Printf("[DEBUG] Creating TrueNAS dataset: %+v", input)
+
 	resp, err := c.Datasets.Create(ctx, input)
 
 	if err != nil {
@@ -163,6 +166,8 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 	}
 
 	d.SetId(resp.ID)
+
+	log.Printf("[INFO] TrueNAS dataset (%s) created", resp.ID)
 
 	// TODO: is this common practice? or should it just return empty diags
 	return append(diags, resourceTrueNASDatasetRead(ctx, d, m)...)
@@ -261,11 +266,15 @@ func resourceTrueNASDatasetDelete(ctx context.Context, d *schema.ResourceData, m
 	c := m.(*Client)
 	id := d.Id()
 
+	log.Printf("[DEBUG] Deleting TrueNAS dataset: %s", id)
+
 	err := c.Datasets.Delete(ctx, id)
 
 	if err != nil {
 		return diag.Errorf("error deleting dataset: %s", err)
 	}
+
+	log.Printf("[INFO] TrueNAS dataset (%s) deleted", id)
 
 	return diags
 }

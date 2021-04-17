@@ -77,6 +77,7 @@ type DatasetResponse struct {
 func (s *DatasetService) Create(ctx context.Context, dataset *CreateDatasetInput) (*DatasetResponse, error) {
 	path := "pool/dataset"
 
+	// TODO: may need to let resource set the type, that way this code can be shared between zvol and filesystem
 	body := struct {
 		CreateDatasetInput
 		Type string `json:"type"`
