@@ -69,7 +69,7 @@ func resourceTrueNASDataset() *schema.Resource {
 				Required:     true,
 				ValidateFunc: validation.StringDoesNotContainAny("/"),
 			},
-			"aclmode": &schema.Schema{
+			"acl_mode": &schema.Schema{
 				Type:         schema.TypeString,
 				Description:  "Determine how chmod behaves when adjusting file ACLs. See the zfs(8) aclmode property.",
 				Optional:     true,
@@ -118,6 +118,12 @@ func resourceTrueNASDataset() *schema.Resource {
 				Computed:     true,
 				ValidateFunc: validation.StringInSlice([]string{"standard", "always", "disabled"}, false),
 			},
+			"snap_dir": &schema.Schema{
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"visible", "hidden"}, false),
+			},
 		},
 	}
 }
@@ -161,12 +167,16 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 		input.Exec = strings.ToUpper(exec.(string))
 	}
 
-	if aclmode, ok := d.GetOk("aclmode"); ok {
+	if aclmode, ok := d.GetOk("acl_mode"); ok {
 		input.ACLMode = strings.ToUpper(aclmode.(string))
 	}
 
 	if atime, ok := d.GetOk("atime"); ok {
 		input.ATime = strings.ToUpper(atime.(string))
+	}
+
+	if snapdir, ok := d.GetOk("snap_dir"); ok {
+		input.SnapDir = strings.ToUpper(snapdir.(string))
 	}
 
 	input.Type = datasetType
@@ -219,8 +229,8 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 	}
 
 	if resp.ACLMode != nil {
-		if err := d.Set("aclmode", strings.ToLower(*resp.ACLMode.Value)); err != nil {
-			return diag.Errorf("error setting aclmode: %s", err)
+		if err := d.Set("acl_mode", strings.ToLower(*resp.ACLMode.Value)); err != nil {
+			return diag.Errorf("error setting acl_mode: %s", err)
 		}
 	}
 
@@ -270,6 +280,12 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 	if resp.Sync != nil {
 		if err := d.Set("sync", strings.ToLower(*resp.Sync.Value)); err != nil {
 			return diag.Errorf("error setting sync: %s", err)
+		}
+	}
+
+	if resp.SnapDir != nil {
+		if err := d.Set("snap_dir", strings.ToLower(*resp.SnapDir.Value)); err != nil {
+			return diag.Errorf("error setting snap_dir: %s", err)
 		}
 	}
 

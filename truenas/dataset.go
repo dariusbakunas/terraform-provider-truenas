@@ -26,6 +26,7 @@ type CreateDatasetInput struct {
 	RefReservation    *int64 `json:"refreservation,omitempty"`
 	Reservation       *int64 `json:"reservation,omitempty"`
 	ShareType         string `json:"share_type,omitempty"`
+	SnapDir           string `json:"snapdir,omitempty"`
 	Sync              string `json:"sync,omitempty"`
 	Type              string `json:"type"`
 }

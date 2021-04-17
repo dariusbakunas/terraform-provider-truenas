@@ -20,4 +20,5 @@ resource "truenas_dataset" "test" {
   copies = 2
   deduplication = "off"
   exec = "on"
+  snap_dir = "hidden"
 }
