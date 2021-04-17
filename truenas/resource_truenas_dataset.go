@@ -112,6 +112,12 @@ func resourceTrueNASDataset() *schema.Resource {
 				Computed:     true,
 				ValidateFunc: validation.StringInSlice([]string{"on", "off"}, false),
 			},
+			"readonly": &schema.Schema{
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"on", "off"}, false),
+			},
 			"record_size": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -186,6 +192,10 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 
 	if atime, ok := d.GetOk("atime"); ok {
 		input.ATime = strings.ToUpper(atime.(string))
+	}
+
+	if readonly, ok := d.GetOk("readonly"); ok {
+		input.Readonly = strings.ToUpper(readonly.(string))
 	}
 
 	if recordSize, ok := d.GetOk("record_size"); ok {
@@ -295,6 +305,12 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 
 		if err := d.Set("copies", copies); err != nil {
 			return diag.Errorf("error setting copies: %s", err)
+		}
+	}
+
+	if resp.Readonly != nil {
+		if err := d.Set("readonly", strings.ToLower(*resp.Readonly.Value)); err != nil {
+			return diag.Errorf("error setting readonly: %s", err)
 		}
 	}
 

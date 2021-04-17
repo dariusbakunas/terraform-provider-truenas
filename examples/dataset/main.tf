@@ -21,6 +21,7 @@ resource "truenas_dataset" "test" {
   deduplication = "off"
   exec = "on"
   snap_dir = "hidden"
+  readonly = "off"
   record_size = "256K"
   share_type = "smb"
 }
