@@ -15,6 +15,7 @@ func Provider() *schema.Provider {
 				Type:        schema.TypeString,
 				Description: "TrueNAS API key",
 				Required:    true,
+				Sensitive:   true,
 				DefaultFunc: schema.EnvDefaultFunc("TRUENAS_API_KEY", nil),
 			},
 			"base_url": {
