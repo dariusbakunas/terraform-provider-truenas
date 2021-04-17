@@ -63,6 +63,13 @@ func resourceTrueNASDataset() *schema.Resource {
 				Required:     true,
 				ValidateFunc: validation.StringDoesNotContainAny("/"),
 			},
+			"aclmode": &schema.Schema{
+				Type: schema.TypeString,
+				Description: "Determine how chmod behaves when adjusting file ACLs. See the zfs(8) aclmode property.",
+				Optional: true,
+				Computed: true,
+				ValidateFunc: validation.StringInSlice([]string{"passthrough", "restricted"}, false),
+			},
 			"comments": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -99,6 +106,10 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 
 	if comments, ok := d.GetOk("comments"); ok {
 		input.Comments = comments.(string)
+	}
+
+	if aclmode, ok := d.GetOk("aclmode"); ok {
+		input.ACLMode = strings.ToUpper(aclmode.(string))
 	}
 
 	resp, err := c.Datasets.Create(ctx, input)
@@ -142,6 +153,12 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 
 	if err := d.Set("name", dpath.Name); err != nil {
 		return diag.Errorf("error setting name: %s", err)
+	}
+
+	if resp.ACLMode != nil {
+		if err := d.Set("aclmode", resp.ACLMode.Value); err != nil {
+			return diag.Errorf("error setting aclmode: %s", err)
+		}
 	}
 
 	if resp.Comments != nil {
