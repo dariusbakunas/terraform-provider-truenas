@@ -15,4 +15,5 @@ resource "truenas_dataset" "test" {
   parent = var.dataset_parent
   comments = "Terraform created dataset"
   sync = "standard"
+  atime = "off"
 }

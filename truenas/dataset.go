@@ -11,6 +11,7 @@ import (
 type DatasetService service
 
 type CreateDatasetInput struct {
+	ATime             string `json:"atime,omitempty"`
 	ACLMode           string `json:"aclmode,omitempty"`
 	Name              string `json:"name"`
 	Comments          string `json:"comments,omitempty"`

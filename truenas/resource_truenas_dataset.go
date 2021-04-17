@@ -64,11 +64,18 @@ func resourceTrueNASDataset() *schema.Resource {
 				ValidateFunc: validation.StringDoesNotContainAny("/"),
 			},
 			"aclmode": &schema.Schema{
-				Type: schema.TypeString,
-				Description: "Determine how chmod behaves when adjusting file ACLs. See the zfs(8) aclmode property.",
-				Optional: true,
-				Computed: true,
+				Type:         schema.TypeString,
+				Description:  "Determine how chmod behaves when adjusting file ACLs. See the zfs(8) aclmode property.",
+				Optional:     true,
+				Computed:     true,
 				ValidateFunc: validation.StringInSlice([]string{"passthrough", "restricted"}, false),
+			},
+			"atime": &schema.Schema{
+				Type:         schema.TypeString,
+				Description:  "Choose 'on' to update the access time for files when they are read. Choose 'off' to prevent producing log traffic when reading files",
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"on", "off"}, false),
 			},
 			"comments": &schema.Schema{
 				Type:     schema.TypeString,
@@ -79,7 +86,7 @@ func resourceTrueNASDataset() *schema.Resource {
 				Description:  "'standard' uses the sync settings that have been requested by the client software, 'always' waits for data writes to complete, and 'disabled' never waits for writes to complete.",
 				Optional:     true,
 				Computed:     true,
-				ValidateFunc: validation.StringInSlice([]string{"standard", "always", "disabled", "inherit"}, false),
+				ValidateFunc: validation.StringInSlice([]string{"standard", "always", "disabled"}, false),
 			},
 		},
 	}
@@ -110,6 +117,10 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 
 	if aclmode, ok := d.GetOk("aclmode"); ok {
 		input.ACLMode = strings.ToUpper(aclmode.(string))
+	}
+
+	if atime, ok := d.GetOk("atime"); ok {
+		input.ATime = strings.ToUpper(atime.(string))
 	}
 
 	resp, err := c.Datasets.Create(ctx, input)
@@ -156,12 +167,19 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 	}
 
 	if resp.ACLMode != nil {
-		if err := d.Set("aclmode", resp.ACLMode.Value); err != nil {
+		if err := d.Set("aclmode", strings.ToLower(*resp.ACLMode.Value)); err != nil {
 			return diag.Errorf("error setting aclmode: %s", err)
 		}
 	}
 
+	if resp.ATime != nil {
+		if err := d.Set("atime", strings.ToLower(*resp.ATime.Value)); err != nil {
+			return diag.Errorf("error setting atime: %s", err)
+		}
+	}
+
 	if resp.Comments != nil {
+		// TrueNAS does not seem to change comments case in any way
 		if err := d.Set("comments", resp.Comments.Value); err != nil {
 			return diag.Errorf("error setting comments: %s", err)
 		}
