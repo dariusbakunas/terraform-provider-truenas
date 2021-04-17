@@ -45,4 +45,4 @@ To run acceptance tests, make sure `TRUENAS_API_KEY` and `TRUENAS_BASE_URL` envi
 make testacc
 ```
 
-**Note:** Acceptance tests create/destroy real resources, while they are named using `tf-test-` testing prefix, take some caution. 
+**Note:** Acceptance tests create/destroy real resources, while they are named using `tf-acc-test-` testing prefix, take some caution. 

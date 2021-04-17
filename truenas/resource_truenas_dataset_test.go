@@ -14,7 +14,7 @@ func TestAccTruenasDataset_basic(t *testing.T) {
 	var dataset DatasetResponse
 	pool := "Tank"
 	suffix := acctest.RandStringFromCharSet(5, acctest.CharSetAlphaNum)
-	name := fmt.Sprintf("tf-acc-test-%s", suffix)
+	name := fmt.Sprintf("%s-%s", testResourcePrefix,suffix)
 	resourceName := "truenas_dataset.test"
 
 	resource.Test(t, resource.TestCase{

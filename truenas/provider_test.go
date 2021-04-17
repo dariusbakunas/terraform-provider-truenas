@@ -9,6 +9,8 @@ import (
 var testAccProviders map[string]*schema.Provider
 var testAccProvider *schema.Provider
 
+const testResourcePrefix = "tf-acc-test-"
+
 func init() {
 	testAccProvider = Provider()
 	testAccProviders = map[string]*schema.Provider{
