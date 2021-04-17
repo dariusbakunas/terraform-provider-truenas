@@ -90,11 +90,17 @@ func resourceTrueNASDataset() *schema.Resource {
 				Computed:     true,
 				ValidateFunc: validation.StringInSlice(supportedCompression, false),
 			},
-			"copies": &schema.Schema {
-				Type: schema.TypeInt,
-				Optional: true,
-				Computed: true,
-				ValidateFunc: validation.IntBetween(1,3),
+			"deduplication": &schema.Schema{
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"on", "off", "verify"}, false),
+			},
+			"copies": &schema.Schema{
+				Type:         schema.TypeInt,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.IntBetween(1, 3),
 			},
 			"sync": &schema.Schema{
 				Type:         schema.TypeString,
@@ -132,6 +138,10 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 
 	if compression, ok := d.GetOk("compression"); ok {
 		input.Compression = strings.ToUpper(compression.(string))
+	}
+
+	if deduplication, ok := d.GetOk("deduplication"); ok {
+		input.Deduplication = strings.ToUpper(deduplication.(string))
 	}
 
 	if copies, ok := d.GetOk("copies"); ok {
@@ -211,6 +221,12 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 	if resp.Compression != nil {
 		if err := d.Set("compression", strings.ToLower(*resp.Compression.Value)); err != nil {
 			return diag.Errorf("error setting compression: %s", err)
+		}
+	}
+
+	if resp.Deduplication != nil {
+		if err := d.Set("deduplication", strings.ToLower(*resp.Deduplication.Value)); err != nil {
+			return diag.Errorf("error setting deduplication: %s", err)
 		}
 	}
 
