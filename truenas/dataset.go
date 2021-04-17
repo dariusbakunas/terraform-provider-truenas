@@ -26,6 +26,7 @@ type CreateDatasetInput struct {
 	Reservation       *int64 `json:"reservation,omitempty"`
 	ShareType         string `json:"share_type,omitempty"`
 	Sync              string `json:"sync,omitempty"`
+	Type string `json:"type"`
 }
 
 // CompositeValue composite value type that most TrueNAS seem to be using
@@ -77,16 +78,7 @@ type DatasetResponse struct {
 func (s *DatasetService) Create(ctx context.Context, dataset *CreateDatasetInput) (*DatasetResponse, error) {
 	path := "pool/dataset"
 
-	// TODO: may need to let resource set the type, that way this code can be shared between zvol and filesystem
-	body := struct {
-		CreateDatasetInput
-		Type string `json:"type"`
-	}{
-		CreateDatasetInput: *dataset,
-		Type:               "FILESYSTEM",
-	}
-
-	req, err := s.client.NewRequest("POST", path, body)
+	req, err := s.client.NewRequest("POST", path, dataset)
 
 	if err != nil {
 		return nil, err

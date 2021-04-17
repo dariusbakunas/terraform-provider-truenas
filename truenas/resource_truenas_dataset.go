@@ -11,6 +11,8 @@ import (
 	"strings"
 )
 
+const datasetType = "FILESYSTEM"
+
 type datasetPath struct {
 	Pool   string
 	Parent string
@@ -156,6 +158,8 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 	if atime, ok := d.GetOk("atime"); ok {
 		input.ATime = strings.ToUpper(atime.(string))
 	}
+
+	input.Type = datasetType
 
 	log.Printf("[DEBUG] Creating TrueNAS dataset: %+v", input)
 
