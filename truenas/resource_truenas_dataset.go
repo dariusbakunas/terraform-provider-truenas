@@ -15,6 +15,8 @@ type datasetPath struct {
 	Name   string
 }
 
+var supportedCompression = []string{"off", "lz4", "gzip", "gzip-1", "gzip-9", "zstd", "zstd-fast", "zle", "lzjb", "zstd-1", "zstd-2", "zstd-3", "zstd-4", "zstd-5", "zstd-6", "zstd-7", "zstd-8", "zstd-9", "zstd-10", "zstd-11", "zstd-12", "zstd-13", "zstd-14", "zstd-15", "zstd-16", "zstd-17", "zstd-18", "zstd-19", "zstd-fast-1", "zstd-fast-2", "zstd-fast-3", "zstd-fast-4", "zstd-fast-5", "zstd-fast-6", "zstd-fast-7", "zstd-fast-8", "zstd-fast-9", "zstd-fast-10", "zstd-fast-20", "zstd-fast-30", "zstd-fast-40", "zstd-fast-50", "zstd-fast-60", "zstd-fast-70", "zstd-fast-80", "zstd-fast-90", "zstd-fast-100", "zstd-fast-500", "zstd-fast-1000"}
+
 // newDatasetPath creates new datasetPath struct
 // from TrueNAS dataset ID string, that comes in format: Pool/Parent/dataset_name
 func newDatasetPath(id string) datasetPath {
@@ -81,6 +83,12 @@ func resourceTrueNASDataset() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
+			"compression": &schema.Schema{
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice(supportedCompression, false),
+			},
 			"sync": &schema.Schema{
 				Type:         schema.TypeString,
 				Description:  "'standard' uses the sync settings that have been requested by the client software, 'always' waits for data writes to complete, and 'disabled' never waits for writes to complete.",
@@ -113,6 +121,10 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 
 	if comments, ok := d.GetOk("comments"); ok {
 		input.Comments = comments.(string)
+	}
+
+	if compression, ok := d.GetOk("compression"); ok {
+		input.Compression = strings.ToUpper(compression.(string))
 	}
 
 	if aclmode, ok := d.GetOk("aclmode"); ok {
@@ -182,6 +194,12 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 		// TrueNAS does not seem to change comments case in any way
 		if err := d.Set("comments", resp.Comments.Value); err != nil {
 			return diag.Errorf("error setting comments: %s", err)
+		}
+	}
+
+	if resp.Compression != nil {
+		if err := d.Set("compression", strings.ToLower(*resp.Compression.Value)); err != nil {
+			return diag.Errorf("error setting compression: %s", err)
 		}
 	}
 

@@ -15,6 +15,7 @@ type CreateDatasetInput struct {
 	ACLMode           string `json:"aclmode,omitempty"`
 	Name              string `json:"name"`
 	Comments          string `json:"comments,omitempty"`
+	Compression       string `json:"compression,omitempty"`
 	CaseSensitivity   string `json:"casesensitivity,omitempty"`
 	Copies            *int8  `json:"copies,omitempty"`
 	InheritEncryption *bool  `json:"inherit_encryption,omitempty"`
