@@ -23,5 +23,5 @@ resource "truenas_dataset" "test" {
   snap_dir = "hidden"
   readonly = "off"
   record_size = "256K"
-  share_type = "smb"
+  case_sensitivity = "mixed"
 }

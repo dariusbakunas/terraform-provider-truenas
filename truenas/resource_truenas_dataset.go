@@ -59,16 +59,19 @@ func resourceTrueNASDataset() *schema.Resource {
 				Type:         schema.TypeString,
 				Required:     true,
 				ValidateFunc: validation.StringDoesNotContainAny("/"),
+				ForceNew:     true,
 			},
 			"parent": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "",
+				ForceNew: true,
 			},
 			"name": &schema.Schema{
 				Type:         schema.TypeString,
 				Required:     true,
 				ValidateFunc: validation.StringDoesNotContainAny("/"),
+				ForceNew:     true,
 			},
 			"acl_mode": &schema.Schema{
 				Type:         schema.TypeString,
@@ -83,6 +86,14 @@ func resourceTrueNASDataset() *schema.Resource {
 				Optional:     true,
 				Computed:     true,
 				ValidateFunc: validation.StringInSlice([]string{"on", "off"}, false),
+			},
+			"case_sensitivity": &schema.Schema{
+				Type:          schema.TypeString,
+				Optional:      true,
+				Computed:      true,
+				ForceNew:      true,
+				ConflictsWith: []string{"share_type"},
+				ValidateFunc:  validation.StringInSlice([]string{"sensitive", "insensitive", "mixed"}, false),
 			},
 			"comments": &schema.Schema{
 				Type:     schema.TypeString,
@@ -128,6 +139,7 @@ func resourceTrueNASDataset() *schema.Resource {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,
+				ForceNew:     true,
 				ValidateFunc: validation.StringInSlice([]string{"generic", "smb"}, false),
 			},
 			"sync": &schema.Schema{
@@ -164,6 +176,10 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 
 	if sync, ok := d.GetOk("sync"); ok {
 		input.Sync = strings.ToUpper(sync.(string))
+	}
+
+	if caseSensitivity, ok := d.GetOk("case_sensitivity"); ok {
+		input.CaseSensitivity = strings.ToUpper(caseSensitivity.(string))
 	}
 
 	if comments, ok := d.GetOk("comments"); ok {
@@ -268,6 +284,12 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 	if resp.ATime != nil {
 		if err := d.Set("atime", strings.ToLower(*resp.ATime.Value)); err != nil {
 			return diag.Errorf("error setting atime: %s", err)
+		}
+	}
+
+	if resp.CaseSensitivity != nil {
+		if err := d.Set("case_sensitivity", strings.ToLower(*resp.CaseSensitivity.Value)); err != nil {
+			return diag.Errorf("error setting case_sensitivity: %s", err)
 		}
 	}
 
