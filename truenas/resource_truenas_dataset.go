@@ -78,6 +78,7 @@ func resourceTrueNASDataset() *schema.Resource {
 				Description:  "Determine how chmod behaves when adjusting file ACLs. See the zfs(8) aclmode property.",
 				Optional:     true,
 				Computed:     true,
+				ConflictsWith: []string{"share_type"},
 				ValidateFunc: validation.StringInSlice([]string{"passthrough", "restricted"}, false),
 			},
 			"atime": &schema.Schema{
