@@ -47,7 +47,7 @@ type DatasetResponse struct {
 	Comments              *CompositeValue `json:"comments"`
 	Pool                  string          `json:"pool"`
 	Type                  string          `json:"type"`
-	Mountpoint            string          `json:"mountpoint"`
+	MountPoint            string          `json:"mountpoint"`
 	Encrypted             bool            `json:"encrypted"`
 	KeyLoaded             bool            `json:"key_loaded"`
 	ManagedBy             *CompositeValue `json:"managedby"`

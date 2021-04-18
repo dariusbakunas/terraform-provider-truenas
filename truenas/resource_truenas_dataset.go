@@ -74,12 +74,12 @@ func resourceTrueNASDataset() *schema.Resource {
 				ForceNew:     true,
 			},
 			"acl_mode": &schema.Schema{
-				Type:         schema.TypeString,
-				Description:  "Determine how chmod behaves when adjusting file ACLs. See the zfs(8) aclmode property.",
-				Optional:     true,
-				Computed:     true,
+				Type:          schema.TypeString,
+				Description:   "Determine how chmod behaves when adjusting file ACLs. See the zfs(8) aclmode property.",
+				Optional:      true,
+				Computed:      true,
 				ConflictsWith: []string{"share_type"},
-				ValidateFunc: validation.StringInSlice([]string{"passthrough", "restricted"}, false),
+				ValidateFunc:  validation.StringInSlice([]string{"passthrough", "restricted"}, false),
 			},
 			"atime": &schema.Schema{
 				Type:         schema.TypeString,
@@ -106,23 +106,31 @@ func resourceTrueNASDataset() *schema.Resource {
 				Computed:     true,
 				ValidateFunc: validation.StringInSlice(supportedCompression, false),
 			},
-			"deduplication": &schema.Schema{
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ValidateFunc: validation.StringInSlice([]string{"on", "off", "verify"}, false),
-			},
 			"copies": &schema.Schema{
 				Type:         schema.TypeInt,
 				Optional:     true,
 				Computed:     true,
 				ValidateFunc: validation.IntBetween(1, 3),
 			},
+			"deduplication": &schema.Schema{
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"on", "off", "verify"}, false),
+			},
 			"exec": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,
 				ValidateFunc: validation.StringInSlice([]string{"on", "off"}, false),
+			},
+			"managed_by": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"mount_point": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
 			},
 			"readonly": &schema.Schema{
 				Type:         schema.TypeString,
@@ -276,6 +284,10 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 		return diag.Errorf("error setting name: %s", err)
 	}
 
+	if err := d.Set("mount_point", resp.MountPoint); err != nil {
+		return diag.Errorf("error setting mount_point: %s", err)
+	}
+
 	if resp.ACLMode != nil {
 		if err := d.Set("acl_mode", strings.ToLower(*resp.ACLMode.Value)); err != nil {
 			return diag.Errorf("error setting acl_mode: %s", err)
@@ -316,6 +328,12 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 	if resp.Exec != nil {
 		if err := d.Set("exec", strings.ToLower(*resp.Exec.Value)); err != nil {
 			return diag.Errorf("error setting exec: %s", err)
+		}
+	}
+
+	if resp.ManagedBy != nil {
+		if err := d.Set("managed_by", resp.ManagedBy.Value); err != nil {
+			return diag.Errorf("error setting managed_by: %s", err)
 		}
 	}
 
