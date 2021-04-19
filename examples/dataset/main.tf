@@ -19,6 +19,8 @@ resource "truenas_dataset" "test" {
   atime = "off"
   copies = 2
   quota_bytes = 2147483648
+  quota_critical = 90
+  quota_warning = 70
   ref_quota_bytes = 1073741824
   deduplication = "off"
   exec = "on"

@@ -58,3 +58,8 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 
 	return c, diags
 }
+
+func getIntPtr(n int) *int {
+	num := n
+	return &num
+}

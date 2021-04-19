@@ -147,6 +147,18 @@ func resourceTrueNASDataset() *schema.Resource {
 				Computed: true,
 				Optional: true,
 			},
+			"quota_critical": &schema.Schema{
+				Type:         schema.TypeInt,
+				Computed:     true,
+				Optional:     true,
+				ValidateFunc: validation.IntBetween(0, 100),
+			},
+			"quota_warning": &schema.Schema{
+				Type:         schema.TypeInt,
+				Computed:     true,
+				Optional:     true,
+				ValidateFunc: validation.IntBetween(0, 100),
+			},
 			"ref_quota_bytes": &schema.Schema{
 				Type:     schema.TypeInt,
 				Computed: true,
@@ -193,14 +205,14 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 
 	c := m.(*Client)
 
-	name := datasetPath{
+	p := datasetPath{
 		Pool:   d.Get("pool").(string),
 		Parent: d.Get("parent").(string),
 		Name:   d.Get("name").(string),
 	}
 
 	input := &CreateDatasetInput{
-		Name: name.String(),
+		Name: p.String(),
 	}
 
 	if sync, ok := d.GetOk("sync"); ok {
@@ -241,6 +253,14 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 
 	if quota, ok := d.GetOk("quota_bytes"); ok {
 		input.Quota = quota.(int)
+	}
+
+	if quotaCritical, ok := d.GetOk("quota_critical"); ok {
+		input.QuotaCritical = getIntPtr(quotaCritical.(int))
+	}
+
+	if quotaWarning, ok := d.GetOk("quota_warning"); ok {
+		input.QuotaWarning = getIntPtr(quotaWarning.(int))
 	}
 
 	if refQuota, ok := d.GetOk("ref_quota_bytes"); ok {
@@ -392,6 +412,30 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 
 		if err := d.Set("quota_bytes", quota); err != nil {
 			return diag.Errorf("error setting quota_bytes: %s", err)
+		}
+	}
+
+	if resp.QuotaCritical != nil {
+		quota, err := strconv.Atoi(*resp.QuotaCritical.Value)
+
+		if err != nil {
+			return diag.Errorf("error parsing quota_critical: %s", err)
+		}
+
+		if err := d.Set("quota_critical", quota); err != nil {
+			return diag.Errorf("error setting quota_critical: %s", err)
+		}
+	}
+
+	if resp.QuotaWarning != nil {
+		quota, err := strconv.Atoi(*resp.QuotaWarning.Value)
+
+		if err != nil {
+			return diag.Errorf("error parsing quota_warning: %s", err)
+		}
+
+		if err := d.Set("quota_warning", quota); err != nil {
+			return diag.Errorf("error setting quota_warning: %s", err)
 		}
 	}
 

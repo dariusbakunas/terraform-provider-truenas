@@ -22,6 +22,8 @@ type CreateDatasetInput struct {
 	Exec              string `json:"exec,omitempty"`
 	InheritEncryption *bool  `json:"inherit_encryption,omitempty"`
 	Quota             int    `json:"quota,omitempty"`
+	QuotaCritical     *int   `json:"quota_critical,omitempty"`
+	QuotaWarning      *int   `json:"quota_warning,omitempty"` // need 0 support here, thus pointer, 0 - disables warnings
 	Readonly          string `json:"readonly,omitempty"`
 	RecordSize        string `json:"recordsize,omitempty"`
 	RefQuota          int    `json:"refquota,omitempty"`
@@ -63,6 +65,8 @@ type DatasetResponse struct {
 	CompressRatio         *CompositeValue `json:"compressratio"`
 	Origin                *CompositeValue `json:"origin"`
 	Quota                 *CompositeValue `json:"quota"`
+	QuotaCritical         *CompositeValue `json:"quota_critical"`
+	QuotaWarning          *CompositeValue `json:"quota_warning"`
 	RefQuota              *CompositeValue `json:"refquota"`
 	Reservation           *CompositeValue `json:"reservation"`
 	RefReservation        *CompositeValue `json:"refreservation"`
