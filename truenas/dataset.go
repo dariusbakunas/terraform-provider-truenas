@@ -21,12 +21,12 @@ type CreateDatasetInput struct {
 	Deduplication     string `json:"deduplication,omitempty"`
 	Exec              string `json:"exec,omitempty"`
 	InheritEncryption *bool  `json:"inherit_encryption,omitempty"`
-	Quota             *int64 `json:"quota,omitempty"`
+	Quota             int    `json:"quota,omitempty"`
 	Readonly          string `json:"readonly,omitempty"`
 	RecordSize        string `json:"recordsize,omitempty"`
-	RefQuota          *int64 `json:"refquota,omitempty"`
-	RefReservation    *int64 `json:"refreservation,omitempty"`
-	Reservation       *int64 `json:"reservation,omitempty"`
+	RefQuota          int    `json:"refquota,omitempty"`
+	RefReservation    int    `json:"refreservation,omitempty"`
+	Reservation       int    `json:"reservation,omitempty"`
 	ShareType         string `json:"share_type,omitempty"`
 	SnapDir           string `json:"snapdir,omitempty"`
 	Sync              string `json:"sync,omitempty"`

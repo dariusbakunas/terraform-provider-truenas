@@ -18,6 +18,7 @@ resource "truenas_dataset" "test" {
   sync = "standard"
   atime = "off"
   copies = 2
+  quota_bytes = 2147483648
   deduplication = "off"
   exec = "on"
   snap_dir = "hidden"
