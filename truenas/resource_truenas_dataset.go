@@ -9,6 +9,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const datasetType = "FILESYSTEM"
@@ -50,6 +51,11 @@ func resourceTrueNASDataset() *schema.Resource {
 		ReadContext:   resourceTrueNASDatasetRead,
 		UpdateContext: resourceTrueNASDatasetUpdate,
 		DeleteContext: resourceTrueNASDatasetDelete,
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(4 * time.Minute),
+			Update: schema.DefaultTimeout(4 * time.Minute),
+			Delete: schema.DefaultTimeout(4 * time.Minute),
+		},
 		Schema: map[string]*schema.Schema{
 			"id": &schema.Schema{
 				Type:     schema.TypeString,
@@ -80,6 +86,10 @@ func resourceTrueNASDataset() *schema.Resource {
 				Computed:      true,
 				ConflictsWith: []string{"share_type"},
 				ValidateFunc:  validation.StringInSlice([]string{"passthrough", "restricted"}, false),
+			},
+			"acl_type": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
 			},
 			"atime": &schema.Schema{
 				Type:         schema.TypeString,
@@ -291,6 +301,12 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 	if resp.ACLMode != nil {
 		if err := d.Set("acl_mode", strings.ToLower(*resp.ACLMode.Value)); err != nil {
 			return diag.Errorf("error setting acl_mode: %s", err)
+		}
+	}
+
+	if resp.ACLType != nil {
+		if err := d.Set("acl_type", strings.ToLower(*resp.ACLType.Value)); err != nil {
+			return diag.Errorf("error setting acl_type: %s", err)
 		}
 	}
 
