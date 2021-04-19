@@ -147,6 +147,11 @@ func resourceTrueNASDataset() *schema.Resource {
 				Computed: true,
 				Optional: true,
 			},
+			"ref_quota_bytes": &schema.Schema{
+				Type:     schema.TypeInt,
+				Computed: true,
+				Optional: true,
+			},
 			"readonly": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -236,6 +241,10 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 
 	if quota, ok := d.GetOk("quota_bytes"); ok {
 		input.Quota = quota.(int)
+	}
+
+	if refQuota, ok := d.GetOk("ref_quota_bytes"); ok {
+		input.RefQuota = refQuota.(int)
 	}
 
 	if readonly, ok := d.GetOk("readonly"); ok {
@@ -383,6 +392,18 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 
 		if err := d.Set("quota_bytes", quota); err != nil {
 			return diag.Errorf("error setting quota_bytes: %s", err)
+		}
+	}
+
+	if resp.RefQuota != nil {
+		quota, err := strconv.Atoi(resp.RefQuota.RawValue)
+
+		if err != nil {
+			return diag.Errorf("error parsing refquota: %s", err)
+		}
+
+		if err := d.Set("ref_quota_bytes", quota); err != nil {
+			return diag.Errorf("error setting ref_quota_bytes: %s", err)
 		}
 	}
 
