@@ -164,6 +164,18 @@ func resourceTrueNASDataset() *schema.Resource {
 				Computed: true,
 				Optional: true,
 			},
+			"ref_quota_critical": &schema.Schema{
+				Type:         schema.TypeInt,
+				Computed:     true,
+				Optional:     true,
+				ValidateFunc: validation.IntBetween(0, 100),
+			},
+			"ref_quota_warning": &schema.Schema{
+				Type:         schema.TypeInt,
+				Computed:     true,
+				Optional:     true,
+				ValidateFunc: validation.IntBetween(0, 100),
+			},
 			"readonly": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -265,6 +277,14 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 
 	if refQuota, ok := d.GetOk("ref_quota_bytes"); ok {
 		input.RefQuota = refQuota.(int)
+	}
+
+	if refQuotaCritical, ok := d.GetOk("ref_quota_critical"); ok {
+		input.RefQuotaCritical = getIntPtr(refQuotaCritical.(int))
+	}
+
+	if refQuotaWarning, ok := d.GetOk("ref_quota_warning"); ok {
+		input.RefQuotaWarning = getIntPtr(refQuotaWarning.(int))
 	}
 
 	if readonly, ok := d.GetOk("readonly"); ok {
@@ -448,6 +468,30 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 
 		if err := d.Set("ref_quota_bytes", quota); err != nil {
 			return diag.Errorf("error setting ref_quota_bytes: %s", err)
+		}
+	}
+
+	if resp.RefQuotaCritical != nil {
+		quota, err := strconv.Atoi(*resp.RefQuotaCritical.Value)
+
+		if err != nil {
+			return diag.Errorf("error parsing refquota_critical: %s", err)
+		}
+
+		if err := d.Set("ref_quota_critical", quota); err != nil {
+			return diag.Errorf("error setting ref_quota_critical: %s", err)
+		}
+	}
+
+	if resp.RefQuotaWarning != nil {
+		quota, err := strconv.Atoi(*resp.RefQuotaWarning.Value)
+
+		if err != nil {
+			return diag.Errorf("error parsing refquota_warning: %s", err)
+		}
+
+		if err := d.Set("ref_quota_warning", quota); err != nil {
+			return diag.Errorf("error setting ref_quota_warning: %s", err)
 		}
 	}
 

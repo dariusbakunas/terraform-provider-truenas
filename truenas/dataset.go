@@ -27,6 +27,8 @@ type CreateDatasetInput struct {
 	Readonly          string `json:"readonly,omitempty"`
 	RecordSize        string `json:"recordsize,omitempty"`
 	RefQuota          int    `json:"refquota,omitempty"`
+	RefQuotaCritical  *int   `json:"refquota_critical,omitempty"`
+	RefQuotaWarning   *int   `json:"refquota_warning,omitempty"`
 	RefReservation    int    `json:"refreservation,omitempty"`
 	Reservation       int    `json:"reservation,omitempty"`
 	ShareType         string `json:"share_type,omitempty"`
@@ -68,6 +70,8 @@ type DatasetResponse struct {
 	QuotaCritical         *CompositeValue `json:"quota_critical"`
 	QuotaWarning          *CompositeValue `json:"quota_warning"`
 	RefQuota              *CompositeValue `json:"refquota"`
+	RefQuotaCritical      *CompositeValue `json:"refquota_critical"`
+	RefQuotaWarning       *CompositeValue `json:"refquota_warning"`
 	Reservation           *CompositeValue `json:"reservation"`
 	RefReservation        *CompositeValue `json:"refreservation"`
 	Copies                *CompositeValue `json:"copies"`

@@ -22,6 +22,8 @@ resource "truenas_dataset" "test" {
   quota_critical = 90
   quota_warning = 70
   ref_quota_bytes = 1073741824
+  ref_quota_critical = 90
+  ref_quota_warning = 70
   deduplication = "off"
   exec = "on"
   snap_dir = "hidden"
