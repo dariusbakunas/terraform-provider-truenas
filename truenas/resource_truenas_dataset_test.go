@@ -25,6 +25,23 @@ func TestAccTruenasDataset_basic(t *testing.T) {
 			{
 				Config: testAccCheckTruenasDatasetResource(pool, name),
 				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "name", name),
+					resource.TestCheckResourceAttr(resourceName, "comments", "Test dataset"),
+					resource.TestCheckResourceAttr(resourceName, "sync", "standard"),
+					resource.TestCheckResourceAttr(resourceName, "atime", "off"),
+					resource.TestCheckResourceAttr(resourceName, "copies", "2"),
+					resource.TestCheckResourceAttr(resourceName, "quota_bytes", "2147483648"),
+					resource.TestCheckResourceAttr(resourceName, "quota_critical", "90"),
+					resource.TestCheckResourceAttr(resourceName, "quota_warning", "70"),
+					resource.TestCheckResourceAttr(resourceName, "ref_quota_bytes", "1073741824"),
+					resource.TestCheckResourceAttr(resourceName, "ref_quota_critical", "90"),
+					resource.TestCheckResourceAttr(resourceName, "ref_quota_warning", "70"),
+					resource.TestCheckResourceAttr(resourceName, "deduplication", "off"),
+					resource.TestCheckResourceAttr(resourceName, "exec", "on"),
+					resource.TestCheckResourceAttr(resourceName, "snap_dir", "hidden"),
+					resource.TestCheckResourceAttr(resourceName, "readonly", "off"),
+					resource.TestCheckResourceAttr(resourceName, "record_size", "256K"),
+					resource.TestCheckResourceAttr(resourceName, "case_sensitivity", "mixed"),
 					testAccCheckTruenasDatasetResourceExists(resourceName, &dataset),
 				),
 			},
@@ -94,6 +111,23 @@ func testAccCheckTruenasDatasetResource(pool string, name string) string {
 	resource "truenas_dataset" "test" {
 		name = "%s"
 		pool = "%s"
+		comments = "Test dataset"
+		compression = "gzip"
+		sync = "standard"
+		atime = "off"
+		copies = 2
+		quota_bytes = 2147483648
+		quota_critical = 90
+		quota_warning = 70
+		ref_quota_bytes = 1073741824
+		ref_quota_critical = 90
+		ref_quota_warning = 70
+		deduplication = "off"
+		exec = "on"
+		snap_dir = "hidden"
+		readonly = "off"
+		record_size = "256K"
+		case_sensitivity = "mixed"
 	}
 	`, name, pool)
 }
