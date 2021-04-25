@@ -9,8 +9,8 @@ terraform {
 
 provider "truenas" {}
 
-data "truenas_pools" "all" {}
+data "truenas_pool_ids" "all" {}
 
 output "all_pools" {
-  value = data.truenas_pools.all.ids
+  value = data.truenas_pool_ids.all.ids
 }

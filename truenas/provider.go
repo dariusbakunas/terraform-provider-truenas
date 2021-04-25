@@ -29,7 +29,7 @@ func Provider() *schema.Provider {
 			"truenas_dataset": resourceTrueNASDataset(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
-			"truenas_pools": dataSourceTrueNASPools(),
+			"truenas_pool_ids": dataSourceTrueNASPoolIDs(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}
@@ -62,4 +62,9 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 func getIntPtr(n int) *int {
 	num := n
 	return &num
+}
+
+func getBoolPtr(b bool) *bool {
+	val := b
+	return &val
 }
