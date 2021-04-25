@@ -25,6 +25,7 @@ resource "truenas_dataset" "test" {
   ref_quota_critical = 90
   ref_quota_warning = 70
   deduplication = "off"
+  encryption = false
   exec = "on"
   snap_dir = "hidden"
   readonly = "off"

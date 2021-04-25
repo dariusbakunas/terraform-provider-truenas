@@ -19,6 +19,7 @@ type CreateDatasetInput struct {
 	CaseSensitivity   string `json:"casesensitivity,omitempty"`
 	Copies            int    `json:"copies,omitempty"`
 	Deduplication     string `json:"deduplication,omitempty"`
+	Encrypted         *bool  `json:"encryption,omitempty"`
 	Exec              string `json:"exec,omitempty"`
 	InheritEncryption *bool  `json:"inherit_encryption,omitempty"`
 	Quota             int    `json:"quota,omitempty"`

@@ -128,6 +128,11 @@ func resourceTrueNASDataset() *schema.Resource {
 				Computed:     true,
 				ValidateFunc: validation.StringInSlice([]string{"on", "off", "verify"}, false),
 			},
+			"encryption": &schema.Schema{
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
 			"exec": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -303,11 +308,17 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 		input.SnapDir = strings.ToUpper(snapDir.(string))
 	}
 
+	encrypted := d.Get("encrypted")
+
+	if encrypted != nil {
+		input.Encrypted = getBoolPtr(encrypted.(bool))
+	}
+
 	input.Type = datasetType
 
 	log.Printf("[DEBUG] Creating TrueNAS dataset: %+v", input)
 
-	resp, err := c.Datasets.Create(ctx, input)
+	resp, err := c.DatasetAPI.Create(ctx, input)
 
 	if err != nil {
 		return diag.Errorf("error creating dataset: %s", err)
@@ -317,7 +328,6 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 
 	log.Printf("[INFO] TrueNAS dataset (%s) created", resp.ID)
 
-	// TODO: is this common practice? or should it just return empty diags
 	return append(diags, resourceTrueNASDatasetRead(ctx, d, m)...)
 }
 
@@ -328,7 +338,7 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 
 	id := d.Id()
 
-	resp, err := c.Datasets.Get(ctx, id)
+	resp, err := c.DatasetAPI.Get(ctx, id)
 
 	if err != nil {
 		return diag.Errorf("error getting dataset: %s", err)
@@ -525,6 +535,10 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 		}
 	}
 
+	if err := d.Set("encryption", resp.Encrypted); err != nil {
+		return diag.Errorf("error setting encryption: %s", err)
+	}
+
 	return diags
 }
 
@@ -540,7 +554,7 @@ func resourceTrueNASDatasetDelete(ctx context.Context, d *schema.ResourceData, m
 
 	log.Printf("[DEBUG] Deleting TrueNAS dataset: %s", id)
 
-	err := c.Datasets.Delete(ctx, id)
+	err := c.DatasetAPI.Delete(ctx, id)
 
 	if err != nil {
 		return diag.Errorf("error deleting dataset: %s", err)
