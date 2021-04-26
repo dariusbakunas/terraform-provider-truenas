@@ -10,32 +10,40 @@ import (
 // methods of the TrueNAS API.
 type DatasetService service
 
+type EncryptionOptions struct {
+	Algorithm   string `json:"algorithm,omitempty"`
+	GenerateKey *bool  `json:"generate_key,omitempty"`
+	Passphrase  string `json:"passphrase,omitempty"`
+	Key         string `json:"key,omitempty"`
+}
+
 type CreateDatasetInput struct {
-	ATime             string `json:"atime,omitempty"`
-	ACLMode           string `json:"aclmode,omitempty"`
-	Name              string `json:"name"`
-	Comments          string `json:"comments,omitempty"`
-	Compression       string `json:"compression,omitempty"`
-	CaseSensitivity   string `json:"casesensitivity,omitempty"`
-	Copies            int    `json:"copies,omitempty"`
-	Deduplication     string `json:"deduplication,omitempty"`
-	Encrypted         *bool  `json:"encryption,omitempty"`
-	Exec              string `json:"exec,omitempty"`
-	InheritEncryption *bool  `json:"inherit_encryption,omitempty"`
-	Quota             int    `json:"quota,omitempty"`
-	QuotaCritical     *int   `json:"quota_critical,omitempty"`
-	QuotaWarning      *int   `json:"quota_warning,omitempty"` // need 0 support here, thus pointer, 0 - disables warnings
-	Readonly          string `json:"readonly,omitempty"`
-	RecordSize        string `json:"recordsize,omitempty"`
-	RefQuota          int    `json:"refquota,omitempty"`
-	RefQuotaCritical  *int   `json:"refquota_critical,omitempty"`
-	RefQuotaWarning   *int   `json:"refquota_warning,omitempty"`
-	RefReservation    int    `json:"refreservation,omitempty"`
-	Reservation       int    `json:"reservation,omitempty"`
-	ShareType         string `json:"share_type,omitempty"`
-	SnapDir           string `json:"snapdir,omitempty"`
-	Sync              string `json:"sync,omitempty"`
-	Type              string `json:"type"`
+	ATime             string             `json:"atime,omitempty"`
+	ACLMode           string             `json:"aclmode,omitempty"`
+	Name              string             `json:"name"`
+	Comments          string             `json:"comments,omitempty"`
+	Compression       string             `json:"compression,omitempty"`
+	CaseSensitivity   string             `json:"casesensitivity,omitempty"`
+	Copies            int                `json:"copies,omitempty"`
+	Deduplication     string             `json:"deduplication,omitempty"`
+	Encrypted         *bool              `json:"encryption,omitempty"`
+	EncryptionOptions *EncryptionOptions `json:"encryption_options,omitempty"`
+	Exec              string             `json:"exec,omitempty"`
+	InheritEncryption *bool              `json:"inherit_encryption,omitempty"`
+	Quota             int                `json:"quota,omitempty"`
+	QuotaCritical     *int               `json:"quota_critical,omitempty"`
+	QuotaWarning      *int               `json:"quota_warning,omitempty"` // need 0 support here, thus pointer, 0 - disables warnings
+	Readonly          string             `json:"readonly,omitempty"`
+	RecordSize        string             `json:"recordsize,omitempty"`
+	RefQuota          int                `json:"refquota,omitempty"`
+	RefQuotaCritical  *int               `json:"refquota_critical,omitempty"`
+	RefQuotaWarning   *int               `json:"refquota_warning,omitempty"`
+	RefReservation    int                `json:"refreservation,omitempty"`
+	Reservation       int                `json:"reservation,omitempty"`
+	ShareType         string             `json:"share_type,omitempty"`
+	SnapDir           string             `json:"snapdir,omitempty"`
+	Sync              string             `json:"sync,omitempty"`
+	Type              string             `json:"type"`
 }
 
 // CompositeValue composite value type that most TrueNAS seem to be using

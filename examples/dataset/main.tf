@@ -25,10 +25,16 @@ resource "truenas_dataset" "test" {
   ref_quota_critical = 90
   ref_quota_warning = 70
   deduplication = "off"
-  encryption = false
   exec = "on"
   snap_dir = "hidden"
   readonly = "off"
   record_size = "256K"
   case_sensitivity = "mixed"
+
+  inherit_encryption = false
+  encrypted = true
+
+  generate_key = false
+  encryption_algorithm = "AES-128-CCM"
+  encryption_key = "3e10193aa02f4167edc46c9f4b8ba723eed474deede646fded99628de1878d51"
 }

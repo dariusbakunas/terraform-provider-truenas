@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"log"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -21,6 +22,7 @@ type datasetPath struct {
 }
 
 var supportedCompression = []string{"off", "lz4", "gzip", "gzip-1", "gzip-9", "zstd", "zstd-fast", "zle", "lzjb", "zstd-1", "zstd-2", "zstd-3", "zstd-4", "zstd-5", "zstd-6", "zstd-7", "zstd-8", "zstd-9", "zstd-10", "zstd-11", "zstd-12", "zstd-13", "zstd-14", "zstd-15", "zstd-16", "zstd-17", "zstd-18", "zstd-19", "zstd-fast-1", "zstd-fast-2", "zstd-fast-3", "zstd-fast-4", "zstd-fast-5", "zstd-fast-6", "zstd-fast-7", "zstd-fast-8", "zstd-fast-9", "zstd-fast-10", "zstd-fast-20", "zstd-fast-30", "zstd-fast-40", "zstd-fast-50", "zstd-fast-60", "zstd-fast-70", "zstd-fast-80", "zstd-fast-90", "zstd-fast-100", "zstd-fast-500", "zstd-fast-1000"}
+var encryptionAlgorithms = []string{"AES-128-CCM", "AES-192-CCM", "AES-256-CCM", "AES-128-GCM", "AES-192-GCM", "AES-256-GCM"}
 var recordSizes = []string{"512", "1K", "2K", "4K", "8K", "16K", "32K", "64K", "128K", "256K", "512K", "1024K"}
 
 // newDatasetPath creates new datasetPath struct
@@ -128,7 +130,41 @@ func resourceTrueNASDataset() *schema.Resource {
 				Computed:     true,
 				ValidateFunc: validation.StringInSlice([]string{"on", "off", "verify"}, false),
 			},
-			"encryption": &schema.Schema{
+			"encrypted": &schema.Schema{
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
+			"inherit_encryption": &schema.Schema{
+				Type:     schema.TypeBool,
+				Optional: true,
+			},
+			"encryption_algorithm": &schema.Schema{
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice(encryptionAlgorithms, false),
+			},
+			"pbkdf2iters": &schema.Schema{
+				Type: schema.TypeInt,
+				//ConflictsWith: []string{"encryption_options.key"},
+				Optional: true,
+				Computed: true,
+			},
+			"passphrase": &schema.Schema{
+				Type:      schema.TypeString,
+				Optional:  true,
+				Sensitive: true,
+			},
+			"encryption_key": &schema.Schema{
+				Type:          schema.TypeString,
+				ConflictsWith: []string{"passphrase"},
+				ValidateFunc:  validation.StringMatch(regexp.MustCompile("^[a-fA-F0-9]+$"), "key must be in hexadecimal format"),
+				Optional:      true,
+				Computed:      true,
+				Sensitive:     true,
+			},
+			"generate_key": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
@@ -312,6 +348,34 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 
 	if encrypted != nil {
 		input.Encrypted = getBoolPtr(encrypted.(bool))
+	}
+
+	inheritEncryption := d.Get("inherit_encryption")
+
+	if inheritEncryption != nil {
+		input.InheritEncryption = getBoolPtr(inheritEncryption.(bool))
+	}
+
+	encOptions := &EncryptionOptions{}
+
+	if algorithm, ok := d.GetOk("encryption_algorithm"); ok {
+		encOptions.Algorithm = algorithm.(string)
+	}
+
+	if genKey, ok := d.GetOk("generate_key"); ok {
+		encOptions.GenerateKey = getBoolPtr(genKey.(bool))
+	}
+
+	if passphrase, ok := d.GetOk("passphrase"); ok {
+		encOptions.Passphrase = passphrase.(string)
+	}
+
+	if key, ok := d.GetOk("encryption_key"); ok {
+		encOptions.Key = key.(string)
+	}
+
+	if (EncryptionOptions{}) != *encOptions {
+		input.EncryptionOptions = encOptions
 	}
 
 	input.Type = datasetType
@@ -535,8 +599,28 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 		}
 	}
 
-	if err := d.Set("encryption", resp.Encrypted); err != nil {
-		return diag.Errorf("error setting encryption: %s", err)
+	if resp.EncryptionAlgorithm != nil && resp.EncryptionAlgorithm.Value != nil {
+		if err := d.Set("encryption_algorithm", *resp.EncryptionAlgorithm.Value); err != nil {
+			return diag.Errorf("error setting encryption_algorithm: %s", err)
+		}
+	}
+
+	if resp.PBKDF2Iters != nil {
+		iters, err := strconv.Atoi(*resp.PBKDF2Iters.Value)
+
+		if err != nil {
+			return diag.Errorf("error parsing PBKDF2Iters: %s", err)
+		}
+
+		if iters > 0 {
+			if err := d.Set("pbkdf2iters", iters); err != nil {
+				return diag.Errorf("error setting PBKDF2Iters: %s", err)
+			}
+		}
+	}
+
+	if err := d.Set("encrypted", resp.Encrypted); err != nil {
+		return diag.Errorf("error setting encrypted: %s", err)
 	}
 
 	return diags
