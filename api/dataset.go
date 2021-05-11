@@ -61,6 +61,7 @@ type DatasetResponse struct {
 	Pool                  string          `json:"pool"`
 	Type                  string          `json:"type"`
 	MountPoint            string          `json:"mountpoint"`
+	EncryptionRoot        string          `json:"encryption_root,omitempty"`
 	Encrypted             bool            `json:"encrypted"`
 	KeyLoaded             bool            `json:"key_loaded"`
 	ManagedBy             *CompositeValue `json:"managedby"`

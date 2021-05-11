@@ -30,6 +30,7 @@ func Provider() *schema.Provider {
 			"truenas_dataset": resourceTrueNASDataset(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
+			"truenas_dataset":  dataSourceTrueNASDataset(),
 			"truenas_pool_ids": dataSourceTrueNASPoolIDs(),
 		},
 		ConfigureContextFunc: providerConfigure,
