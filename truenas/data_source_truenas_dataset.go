@@ -40,18 +40,21 @@ func dataSourceTrueNASDataset() *schema.Resource {
 			},
 			"atime": &schema.Schema{
 				Type:        schema.TypeString,
-				Description: "Choose 'on' to update the access time for files when they are read. Choose 'off' to prevent producing log traffic when reading files",
+				Description: "When set to 'on' access time for files when they are read is updated. Set to 'off' to prevent producing log traffic when reading files",
 				Computed:    true,
 			},
 			"case_sensitivity": &schema.Schema{
+				Description: "`sensitive` assumes filenames are case sensitive. `insensitive` assumes filenames are not case sensitive. `mixed` understands both types of filenames.",
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 			"comments": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "Any notes about this dataset.",
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 			"compression": &schema.Schema{
+				Description: "Current dataset compression level",
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -60,6 +63,7 @@ func dataSourceTrueNASDataset() *schema.Resource {
 				Computed: true,
 			},
 			"deduplication": &schema.Schema{
+				Description: "Deduplication can improve storage capacity, but is RAM intensive",
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -80,7 +84,7 @@ func dataSourceTrueNASDataset() *schema.Resource {
 				Computed: true,
 			},
 			"key_loaded": &schema.Schema{
-				Type: schema.TypeBool,
+				Type:     schema.TypeBool,
 				Computed: true,
 			},
 			"pbkdf2iters": &schema.Schema{
@@ -101,11 +105,12 @@ func dataSourceTrueNASDataset() *schema.Resource {
 			//	Computed: true,
 			//},
 			"exec": &schema.Schema{
+				Description: "`on` if processes can be executed from within this dataset.",
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 			"key_format": &schema.Schema{
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Computed: true,
 			},
 			"managed_by": &schema.Schema{
@@ -113,6 +118,10 @@ func dataSourceTrueNASDataset() *schema.Resource {
 				Computed: true,
 			},
 			"mount_point": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"origin": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -149,31 +158,31 @@ func dataSourceTrueNASDataset() *schema.Resource {
 				Computed: true,
 			},
 			"record_size": &schema.Schema{
+				Description: "Matching the fixed size of data, as in a database, may result in better performance",
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 			"record_size_bytes": &schema.Schema{
-				Type: schema.TypeInt,
+				Description: "Matching the fixed size of data, as in a database, may result in better performance",
+				Type:     schema.TypeInt,
 				Computed: true,
 			},
 			"reservation": &schema.Schema{
-				Type: schema.TypeInt,
-				Computed: true,
-			},
-			"sync": &schema.Schema{
-				Type:     schema.TypeString,
+				Type:     schema.TypeInt,
 				Computed: true,
 			},
 			"snap_dir": &schema.Schema{
+				Description: ".zfs snapshot directory visibility.",
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"sync": &schema.Schema{
+				Description: "`standard` uses the sync settings that have been requested by the client software, `always` waits for data writes to complete, and `disabled` never waits for writes to complete.",
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 			"xattr": &schema.Schema{
-				Type: schema.TypeString,
-				Computed: true,
-			},
-			"origin": &schema.Schema{
-				Type: schema.TypeString,
+				Type:     schema.TypeString,
 				Computed: true,
 			},
 		},
