@@ -73,6 +73,7 @@ type Client struct {
 	// Services used for talking to different parts of the TrueNAS API.
 	PoolAPI    *PoolService
 	DatasetAPI *DatasetService
+	ServiceAPI *ServiceAPI
 }
 
 // NewClient returns a new TrueNAS API client.
@@ -95,6 +96,7 @@ func NewClient(baseURL string, httpClient *http.Client) (*Client, error) {
 	baseService := service{c}
 	c.PoolAPI = (*PoolService)(&baseService)
 	c.DatasetAPI = (*DatasetService)(&baseService)
+	c.ServiceAPI = (*ServiceAPI)(&baseService)
 
 	return c, nil
 }
