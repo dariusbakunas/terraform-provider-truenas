@@ -3,6 +3,7 @@ package truenas
 import (
 	"context"
 	"fmt"
+	"github.com/dariusbakunas/terraform-provider-truenas/api"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
@@ -256,7 +257,7 @@ func resourceTrueNASDataset() *schema.Resource {
 func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	c := m.(*Client)
+	c := m.(*api.Client)
 
 	p := datasetPath{
 		Pool:   d.Get("pool").(string),
@@ -264,7 +265,7 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 		Name:   d.Get("name").(string),
 	}
 
-	input := &CreateDatasetInput{
+	input := &api.CreateDatasetInput{
 		Name: p.String(),
 	}
 
@@ -356,7 +357,7 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 		input.InheritEncryption = getBoolPtr(inheritEncryption.(bool))
 	}
 
-	encOptions := &EncryptionOptions{}
+	encOptions := &api.EncryptionOptions{}
 
 	if algorithm, ok := d.GetOk("encryption_algorithm"); ok {
 		encOptions.Algorithm = algorithm.(string)
@@ -374,7 +375,7 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 		encOptions.Key = key.(string)
 	}
 
-	if (EncryptionOptions{}) != *encOptions {
+	if (api.EncryptionOptions{}) != *encOptions {
 		input.EncryptionOptions = encOptions
 	}
 
@@ -398,7 +399,7 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	c := m.(*Client)
+	c := m.(*api.Client)
 
 	id := d.Id()
 
@@ -633,7 +634,7 @@ func resourceTrueNASDatasetUpdate(ctx context.Context, d *schema.ResourceData, m
 func resourceTrueNASDatasetDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	c := m.(*Client)
+	c := m.(*api.Client)
 	id := d.Id()
 
 	log.Printf("[DEBUG] Deleting TrueNAS dataset: %s", id)

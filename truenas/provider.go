@@ -2,6 +2,7 @@ package truenas
 
 import (
 	"context"
+	"github.com/dariusbakunas/terraform-provider-truenas/api"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"golang.org/x/oauth2"
@@ -46,7 +47,7 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		&oauth2.Token{AccessToken: apiKey},
 	)
 	tc := oauth2.NewClient(ctx, ts)
-	c, err := NewClient(baseURL, tc)
+	c, err := api.NewClient(baseURL, tc)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,

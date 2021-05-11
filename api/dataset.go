@@ -1,4 +1,4 @@
-package truenas
+package api
 
 import (
 	"context"

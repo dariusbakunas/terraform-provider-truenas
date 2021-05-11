@@ -3,6 +3,7 @@ package truenas
 import (
 	"context"
 	"fmt"
+	"github.com/dariusbakunas/terraform-provider-truenas/api"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
@@ -11,7 +12,7 @@ import (
 )
 
 func TestAccTruenasDataset_basic(t *testing.T) {
-	var dataset DatasetResponse
+	var dataset api.DatasetResponse
 	pool := "Tank"
 	suffix := acctest.RandStringFromCharSet(5, acctest.CharSetAlphaNum)
 	name := fmt.Sprintf("%s-%s", testResourcePrefix, suffix)
@@ -50,7 +51,7 @@ func TestAccTruenasDataset_basic(t *testing.T) {
 }
 
 func testAccCheckTruenasDatasetDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*Client)
+	client := testAccProvider.Meta().(*api.Client)
 
 	// loop through the resources in state, verifying each widget
 	// is destroyed
@@ -132,7 +133,7 @@ func testAccCheckTruenasDatasetResource(pool string, name string) string {
 	`, name, pool)
 }
 
-func testAccCheckTruenasDatasetResourceExists(n string, dataset *DatasetResponse) resource.TestCheckFunc {
+func testAccCheckTruenasDatasetResourceExists(n string, dataset *api.DatasetResponse) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
@@ -143,7 +144,7 @@ func testAccCheckTruenasDatasetResourceExists(n string, dataset *DatasetResponse
 			return fmt.Errorf("no dataset ID is set")
 		}
 
-		client := testAccProvider.Meta().(*Client)
+		client := testAccProvider.Meta().(*api.Client)
 
 		resp, err := client.DatasetAPI.Get(context.Background(), rs.Primary.ID)
 

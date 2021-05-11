@@ -2,6 +2,7 @@ package truenas
 
 import (
 	"context"
+	"github.com/dariusbakunas/terraform-provider-truenas/api"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"log"
@@ -23,12 +24,12 @@ func dataSourceTrueNASPoolIDs() *schema.Resource {
 }
 
 func dataSourceTrueNASPoolsRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*Client)
+	c := m.(*api.Client)
 
 	// Warning or errors can be collected in a slice type
 	var diags diag.Diagnostics
 
-	pools, err := c.PoolAPI.List(ctx, &ListOptions{})
+	pools, err := c.PoolAPI.List(ctx, &api.ListOptions{})
 
 	if err != nil {
 		return diag.FromErr(err)
@@ -49,7 +50,7 @@ func dataSourceTrueNASPoolsRead(ctx context.Context, d *schema.ResourceData, m i
 	return diags
 }
 
-func flattenPoolsResponse(pools []Pool) []int64 {
+func flattenPoolsResponse(pools []api.Pool) []int64 {
 	result := make([]int64, len(pools))
 
 	for i, pool := range pools {
