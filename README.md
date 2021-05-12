@@ -6,6 +6,12 @@
 
 Still in early development, check `examples` folder for working examples
 
+## Documentation
+
+Full documentation is available on the Terraform website:
+
+https://registry.terraform.io/providers/dariusbakunas/truenas/latest/docs
+
 ## Development
 
 ### Requirements
