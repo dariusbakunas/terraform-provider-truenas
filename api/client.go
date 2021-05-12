@@ -72,6 +72,7 @@ type Client struct {
 
 	// Services used for talking to different parts of the TrueNAS API.
 	PoolAPI    *PoolService
+	CronjobAPI *CronjobService
 	DatasetAPI *DatasetService
 	ServiceAPI *ServiceAPI
 }
@@ -95,6 +96,7 @@ func NewClient(baseURL string, httpClient *http.Client) (*Client, error) {
 
 	baseService := service{c}
 	c.PoolAPI = (*PoolService)(&baseService)
+	c.CronjobAPI = (*CronjobService)(&baseService)
 	c.DatasetAPI = (*DatasetService)(&baseService)
 	c.ServiceAPI = (*ServiceAPI)(&baseService)
 

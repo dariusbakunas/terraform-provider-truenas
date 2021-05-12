@@ -39,10 +39,10 @@ resource "truenas_dataset" "test" {
   encryption_key = "3e10193aa02f4167edc46c9f4b8ba723eed474deede646fded99628de1878d51"
 }
 
-data "truenas_dataset" "dataset" {
-  id = truenas_dataset.test.id
+data "truenas_cronjob" "cj" {
+  id = 1
 }
 
 output "dataset" {
-  value = data.truenas_dataset.dataset
+  value = data.truenas_cronjob.cj
 }

@@ -8,11 +8,11 @@ import (
 type ServiceAPI service
 
 type Service struct {
-	ID int `json:"id"`
-	Service string `json:"service"`
-	Enabled bool `json:"enable"`
-	State string `json:"state"`
-	Pids []int64 `json:"pids"`
+	ID      int     `json:"id"`
+	Service string  `json:"service"`
+	Enabled bool    `json:"enable"`
+	State   string  `json:"state"`
+	Pids    []int64 `json:"pids"`
 }
 
 func (s *ServiceAPI) Get(ctx context.Context, id int) (*Service, error) {

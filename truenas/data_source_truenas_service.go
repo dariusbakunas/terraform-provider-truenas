@@ -16,22 +16,22 @@ func dataSourceTrueNASService() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"id": &schema.Schema{
 				Description: "Service ID",
-				Type:     schema.TypeInt,
-				Required: true,
+				Type:        schema.TypeInt,
+				Required:    true,
 			},
 			"name": &schema.Schema{
 				Description: "Service name",
-				Type: schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 			"enabled": &schema.Schema{
 				Description: "`true` if service is enabled",
-				Type: schema.TypeBool,
-				Computed: true,
+				Type:        schema.TypeBool,
+				Computed:    true,
 			},
 			"pids": &schema.Schema{
 				Description: "List of pids that belong to service",
-				Type:     schema.TypeList,
+				Type:        schema.TypeList,
 				Elem: &schema.Schema{
 					Type: schema.TypeInt,
 				},
@@ -39,8 +39,8 @@ func dataSourceTrueNASService() *schema.Resource {
 			},
 			"state": &schema.Schema{
 				Description: "Current state: `stopped`, `running`",
-				Type: schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 		},
 	}
