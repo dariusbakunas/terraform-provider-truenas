@@ -10,6 +10,7 @@ import (
 
 func resourceTrueNASCronjob() *schema.Resource {
 	return &schema.Resource{
+		Description:   "TrueNAS allows users to run specific commands or scripts on a regular schedule using cron(8). This can be helpful for running repetitive tasks.",
 		CreateContext: resourceTrueNASCronjobCreate,
 		ReadContext:   resourceTrueNASCronjobRead,
 		UpdateContext: resourceTrueNASCronjobUpdate,

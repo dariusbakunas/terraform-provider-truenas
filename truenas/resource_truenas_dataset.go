@@ -134,27 +134,32 @@ func resourceTrueNASDataset() *schema.Resource {
 			"encrypted": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
+				ForceNew: true,
 				Computed: true,
 			},
 			"inherit_encryption": &schema.Schema{
 				Type:     schema.TypeBool,
+				ForceNew: true,
 				Optional: true,
 			},
 			"encryption_algorithm": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,
+				ForceNew:     true,
 				ValidateFunc: validation.StringInSlice(encryptionAlgorithms, false),
 			},
 			"pbkdf2iters": &schema.Schema{
 				Type: schema.TypeInt,
 				//ConflictsWith: []string{"encryption_options.key"},
+				ForceNew: true,
 				Optional: true,
 				Computed: true,
 			},
 			"passphrase": &schema.Schema{
 				Type:      schema.TypeString,
 				Optional:  true,
+				ForceNew:  true,
 				Sensitive: true,
 			},
 			"encryption_key": &schema.Schema{
@@ -162,12 +167,14 @@ func resourceTrueNASDataset() *schema.Resource {
 				ConflictsWith: []string{"passphrase"},
 				ValidateFunc:  validation.StringMatch(regexp.MustCompile("^[a-fA-F0-9]+$"), "key must be in hexadecimal format"),
 				Optional:      true,
+				ForceNew:      true,
 				Computed:      true,
 				Sensitive:     true,
 			},
 			"generate_key": &schema.Schema{
 				Type:     schema.TypeBool,
 				Optional: true,
+				ForceNew: true,
 				Computed: true,
 			},
 			"exec": &schema.Schema{
@@ -259,127 +266,7 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 
 	c := m.(*api.Client)
 
-	p := datasetPath{
-		Pool:   d.Get("pool").(string),
-		Parent: d.Get("parent").(string),
-		Name:   d.Get("name").(string),
-	}
-
-	input := &api.CreateDatasetInput{
-		Name: p.String(),
-	}
-
-	if sync, ok := d.GetOk("sync"); ok {
-		input.Sync = strings.ToUpper(sync.(string))
-	}
-
-	if caseSensitivity, ok := d.GetOk("case_sensitivity"); ok {
-		input.CaseSensitivity = strings.ToUpper(caseSensitivity.(string))
-	}
-
-	if comments, ok := d.GetOk("comments"); ok {
-		input.Comments = comments.(string)
-	}
-
-	if compression, ok := d.GetOk("compression"); ok {
-		input.Compression = strings.ToUpper(compression.(string))
-	}
-
-	if deduplication, ok := d.GetOk("deduplication"); ok {
-		input.Deduplication = strings.ToUpper(deduplication.(string))
-	}
-
-	if copies, ok := d.GetOk("copies"); ok {
-		input.Copies = copies.(int)
-	}
-
-	if exec, ok := d.GetOk("exec"); ok {
-		input.Exec = strings.ToUpper(exec.(string))
-	}
-
-	if aclmode, ok := d.GetOk("acl_mode"); ok {
-		input.ACLMode = strings.ToUpper(aclmode.(string))
-	}
-
-	if atime, ok := d.GetOk("atime"); ok {
-		input.ATime = strings.ToUpper(atime.(string))
-	}
-
-	if quota, ok := d.GetOk("quota_bytes"); ok {
-		input.Quota = quota.(int)
-	}
-
-	if quotaCritical, ok := d.GetOk("quota_critical"); ok {
-		input.QuotaCritical = getIntPtr(quotaCritical.(int))
-	}
-
-	if quotaWarning, ok := d.GetOk("quota_warning"); ok {
-		input.QuotaWarning = getIntPtr(quotaWarning.(int))
-	}
-
-	if refQuota, ok := d.GetOk("ref_quota_bytes"); ok {
-		input.RefQuota = refQuota.(int)
-	}
-
-	if refQuotaCritical, ok := d.GetOk("ref_quota_critical"); ok {
-		input.RefQuotaCritical = getIntPtr(refQuotaCritical.(int))
-	}
-
-	if refQuotaWarning, ok := d.GetOk("ref_quota_warning"); ok {
-		input.RefQuotaWarning = getIntPtr(refQuotaWarning.(int))
-	}
-
-	if readonly, ok := d.GetOk("readonly"); ok {
-		input.Readonly = strings.ToUpper(readonly.(string))
-	}
-
-	if recordSize, ok := d.GetOk("record_size"); ok {
-		input.RecordSize = strings.ToUpper(recordSize.(string))
-	}
-
-	if shareType, ok := d.GetOk("share_type"); ok {
-		input.ShareType = strings.ToUpper(shareType.(string))
-	}
-
-	if snapDir, ok := d.GetOk("snap_dir"); ok {
-		input.SnapDir = strings.ToUpper(snapDir.(string))
-	}
-
-	encrypted := d.Get("encrypted")
-
-	if encrypted != nil {
-		input.Encrypted = getBoolPtr(encrypted.(bool))
-	}
-
-	inheritEncryption := d.Get("inherit_encryption")
-
-	if inheritEncryption != nil {
-		input.InheritEncryption = getBoolPtr(inheritEncryption.(bool))
-	}
-
-	encOptions := &api.EncryptionOptions{}
-
-	if algorithm, ok := d.GetOk("encryption_algorithm"); ok {
-		encOptions.Algorithm = algorithm.(string)
-	}
-
-	if genKey, ok := d.GetOk("generate_key"); ok {
-		encOptions.GenerateKey = getBoolPtr(genKey.(bool))
-	}
-
-	if passphrase, ok := d.GetOk("passphrase"); ok {
-		encOptions.Passphrase = passphrase.(string)
-	}
-
-	if key, ok := d.GetOk("encryption_key"); ok {
-		encOptions.Key = key.(string)
-	}
-
-	if (api.EncryptionOptions{}) != *encOptions {
-		input.EncryptionOptions = encOptions
-	}
-
-	input.Type = datasetType
+	input := flattenDataset(d)
 
 	log.Printf("[DEBUG] Creating TrueNAS dataset: %+v", input)
 
@@ -628,7 +515,23 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 }
 
 func resourceTrueNASDatasetUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	return resourceTrueNASDatasetRead(ctx, d, m)
+	var diags diag.Diagnostics
+
+	c := m.(*api.Client)
+
+	input := flattenDatasetForUpdate(d)
+
+	log.Printf("[DEBUG] Updating TrueNAS dataset: %+v", input)
+
+	err := c.DatasetAPI.Update(ctx, d.Id(), input)
+
+	if err != nil {
+		return diag.Errorf("error creating dataset: %s", err)
+	}
+
+	log.Printf("[INFO] TrueNAS dataset (%s) updated", d.Id())
+
+	return append(diags, resourceTrueNASDatasetRead(ctx, d, m)...)
 }
 
 func resourceTrueNASDatasetDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -648,4 +551,187 @@ func resourceTrueNASDatasetDelete(ctx context.Context, d *schema.ResourceData, m
 	log.Printf("[INFO] TrueNAS dataset (%s) deleted", id)
 
 	return diags
+}
+
+func flattenDataset(d *schema.ResourceData) *api.CreateDatasetInput {
+	p := datasetPath{
+		Pool:   d.Get("pool").(string),
+		Parent: d.Get("parent").(string),
+		Name:   d.Get("name").(string),
+	}
+
+	input := &api.CreateDatasetInput{
+		Name: p.String(),
+	}
+
+	if sync, ok := d.GetOk("sync"); ok {
+		input.Sync = strings.ToUpper(sync.(string))
+	}
+
+	if caseSensitivity, ok := d.GetOk("case_sensitivity"); ok {
+		input.CaseSensitivity = strings.ToUpper(caseSensitivity.(string))
+	}
+
+	if comments, ok := d.GetOk("comments"); ok {
+		input.Comments = comments.(string)
+	}
+
+	if compression, ok := d.GetOk("compression"); ok {
+		input.Compression = strings.ToUpper(compression.(string))
+	}
+
+	if deduplication, ok := d.GetOk("deduplication"); ok {
+		input.Deduplication = strings.ToUpper(deduplication.(string))
+	}
+
+	if copies, ok := d.GetOk("copies"); ok {
+		input.Copies = copies.(int)
+	}
+
+	if exec, ok := d.GetOk("exec"); ok {
+		input.Exec = strings.ToUpper(exec.(string))
+	}
+
+	if aclmode, ok := d.GetOk("acl_mode"); ok {
+		input.ACLMode = strings.ToUpper(aclmode.(string))
+	}
+
+	if atime, ok := d.GetOk("atime"); ok {
+		input.ATime = strings.ToUpper(atime.(string))
+	}
+
+	if quota, ok := d.GetOk("quota_bytes"); ok {
+		input.Quota = quota.(int)
+	}
+
+	if quotaCritical, ok := d.GetOk("quota_critical"); ok {
+		input.QuotaCritical = getIntPtr(quotaCritical.(int))
+	}
+
+	if quotaWarning, ok := d.GetOk("quota_warning"); ok {
+		input.QuotaWarning = getIntPtr(quotaWarning.(int))
+	}
+
+	if refQuota, ok := d.GetOk("ref_quota_bytes"); ok {
+		input.RefQuota = refQuota.(int)
+	}
+
+	if refQuotaCritical, ok := d.GetOk("ref_quota_critical"); ok {
+		input.RefQuotaCritical = getIntPtr(refQuotaCritical.(int))
+	}
+
+	if refQuotaWarning, ok := d.GetOk("ref_quota_warning"); ok {
+		input.RefQuotaWarning = getIntPtr(refQuotaWarning.(int))
+	}
+
+	if readonly, ok := d.GetOk("readonly"); ok {
+		input.Readonly = strings.ToUpper(readonly.(string))
+	}
+
+	if recordSize, ok := d.GetOk("record_size"); ok {
+		input.RecordSize = strings.ToUpper(recordSize.(string))
+	}
+
+	if shareType, ok := d.GetOk("share_type"); ok {
+		input.ShareType = strings.ToUpper(shareType.(string))
+	}
+
+	if snapDir, ok := d.GetOk("snap_dir"); ok {
+		input.SnapDir = strings.ToUpper(snapDir.(string))
+	}
+
+	encrypted := d.Get("encrypted")
+
+	if encrypted != nil {
+		input.Encrypted = getBoolPtr(encrypted.(bool))
+	}
+
+	inheritEncryption := d.Get("inherit_encryption")
+
+	if inheritEncryption != nil {
+		input.InheritEncryption = getBoolPtr(inheritEncryption.(bool))
+	}
+
+	encOptions := &api.EncryptionOptions{}
+
+	if algorithm, ok := d.GetOk("encryption_algorithm"); ok {
+		encOptions.Algorithm = algorithm.(string)
+	}
+
+	if genKey, ok := d.GetOk("generate_key"); ok {
+		encOptions.GenerateKey = getBoolPtr(genKey.(bool))
+	}
+
+	if passphrase, ok := d.GetOk("passphrase"); ok {
+		encOptions.Passphrase = passphrase.(string)
+	}
+
+	if key, ok := d.GetOk("encryption_key"); ok {
+		encOptions.Key = key.(string)
+	}
+
+	if (api.EncryptionOptions{}) != *encOptions {
+		input.EncryptionOptions = encOptions
+	}
+
+	input.Type = datasetType
+	return input
+}
+
+func flattenDatasetForUpdate(d *schema.ResourceData) *api.UpdateDatasetInput {
+	input := &api.UpdateDatasetInput{}
+
+	if sync, ok := d.GetOk("sync"); ok {
+		input.Sync = strings.ToUpper(sync.(string))
+	}
+
+	if comments, ok := d.GetOk("comments"); ok {
+		input.Comments = comments.(string)
+	}
+
+	if compression, ok := d.GetOk("compression"); ok {
+		input.Compression = strings.ToUpper(compression.(string))
+	}
+
+	if deduplication, ok := d.GetOk("deduplication"); ok {
+		input.Deduplication = strings.ToUpper(deduplication.(string))
+	}
+
+	if copies, ok := d.GetOk("copies"); ok {
+		input.Copies = copies.(int)
+	}
+
+	if exec, ok := d.GetOk("exec"); ok {
+		input.Exec = strings.ToUpper(exec.(string))
+	}
+
+	if aclmode, ok := d.GetOk("acl_mode"); ok {
+		input.ACLMode = strings.ToUpper(aclmode.(string))
+	}
+
+	if atime, ok := d.GetOk("atime"); ok {
+		input.ATime = strings.ToUpper(atime.(string))
+	}
+
+	if quota, ok := d.GetOk("quota_bytes"); ok {
+		input.Quota = quota.(int)
+	}
+
+	if refQuota, ok := d.GetOk("ref_quota_bytes"); ok {
+		input.RefQuota = refQuota.(int)
+	}
+
+	if readonly, ok := d.GetOk("readonly"); ok {
+		input.Readonly = strings.ToUpper(readonly.(string))
+	}
+
+	if recordSize, ok := d.GetOk("record_size"); ok {
+		input.RecordSize = strings.ToUpper(recordSize.(string))
+	}
+
+	if snapDir, ok := d.GetOk("snap_dir"); ok {
+		input.SnapDir = strings.ToUpper(snapDir.(string))
+	}
+
+	return input
 }

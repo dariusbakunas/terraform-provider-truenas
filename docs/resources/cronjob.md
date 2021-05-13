@@ -3,12 +3,12 @@
 page_title: "truenas_cronjob Resource - terraform-provider-truenas"
 subcategory: ""
 description: |-
-  
+  TrueNAS allows users to run specific commands or scripts on a regular schedule using cron(8). This can be helpful for running repetitive tasks.
 ---
 
 # truenas_cronjob (Resource)
 
-
+TrueNAS allows users to run specific commands or scripts on a regular schedule using cron(8). This can be helpful for running repetitive tasks.
 
 ## Example Usage
 

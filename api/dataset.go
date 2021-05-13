@@ -17,6 +17,28 @@ type EncryptionOptions struct {
 	Key         string `json:"key,omitempty"`
 }
 
+type UpdateDatasetInput struct {
+	ATime         string `json:"atime,omitempty"`
+	ACLMode       string `json:"aclmode,omitempty"`
+	Comments      string `json:"comments,omitempty"`
+	Compression   string `json:"compression,omitempty"`
+	Copies        int    `json:"copies,omitempty"`
+	Deduplication string `json:"deduplication,omitempty"`
+	Exec          string `json:"exec,omitempty"`
+	Quota         int    `json:"quota,omitempty"`
+	//QuotaCritical     *int               `json:"quota_critical,omitempty"`
+	//QuotaWarning      *int               `json:"quota_warning,omitempty"` // need 0 support here, thus pointer, 0 - disables warnings
+	Readonly   string `json:"readonly,omitempty"`
+	RecordSize string `json:"recordsize,omitempty"`
+	RefQuota   int    `json:"refquota,omitempty"`
+	//RefQuotaCritical  *int               `json:"refquota_critical,omitempty"`
+	//RefQuotaWarning   *int               `json:"refquota_warning,omitempty"`
+	RefReservation int    `json:"refreservation,omitempty"`
+	Reservation    int    `json:"reservation,omitempty"`
+	SnapDir        string `json:"snapdir,omitempty"`
+	Sync           string `json:"sync,omitempty"`
+}
+
 type CreateDatasetInput struct {
 	ATime             string             `json:"atime,omitempty"`
 	ACLMode           string             `json:"aclmode,omitempty"`
@@ -116,6 +138,24 @@ func (s *DatasetService) Create(ctx context.Context, dataset *CreateDatasetInput
 	}
 
 	return d, nil
+}
+
+func (s *DatasetService) Update(ctx context.Context, id string, dataset *UpdateDatasetInput) error {
+	path := fmt.Sprintf("pool/dataset/id/%s", url.QueryEscape(id))
+
+	req, err := s.client.NewRequest("PUT", path, dataset)
+
+	if err != nil {
+		return err
+	}
+
+	_, err = s.client.Do(ctx, req, nil)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *DatasetService) Get(ctx context.Context, id string) (*DatasetResponse, error) {

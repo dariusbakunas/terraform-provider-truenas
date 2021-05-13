@@ -38,11 +38,3 @@ resource "truenas_dataset" "test" {
   encryption_algorithm = "AES-128-CCM"
   encryption_key = "3e10193aa02f4167edc46c9f4b8ba723eed474deede646fded99628de1878d51"
 }
-
-data "truenas_cronjob" "cj" {
-  id = 1
-}
-
-output "dataset" {
-  value = data.truenas_cronjob.cj
-}
