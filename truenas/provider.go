@@ -27,6 +27,7 @@ func Provider() *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
+			"truenas_cronjob": resourceTrueNASCronjob(),
 			"truenas_dataset": resourceTrueNASDataset(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{

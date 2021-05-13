@@ -18,6 +18,11 @@ func dataSourceTrueNASCronjob() *schema.Resource {
 				Type:        schema.TypeInt,
 				Required:    true,
 			},
+			"user": &schema.Schema{
+				Description: "Account that is used to run the job",
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
 			"command": &schema.Schema{
 				Description: "Command or script that runs on schedule",
 				Type:        schema.TypeString,
@@ -50,24 +55,24 @@ func dataSourceTrueNASCronjob() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"minute": &schema.Schema{
-							Type: schema.TypeString,
-							Computed:    true,
+							Type:     schema.TypeString,
+							Computed: true,
 						},
 						"hour": &schema.Schema{
-							Type: schema.TypeString,
-							Computed:    true,
+							Type:     schema.TypeString,
+							Computed: true,
 						},
 						"dom": &schema.Schema{
-							Type: schema.TypeString,
-							Computed:    true,
+							Type:     schema.TypeString,
+							Computed: true,
 						},
 						"month": &schema.Schema{
-							Type: schema.TypeString,
-							Computed:    true,
+							Type:     schema.TypeString,
+							Computed: true,
 						},
 						"dow": &schema.Schema{
-							Type: schema.TypeString,
-							Computed:    true,
+							Type:     schema.TypeString,
+							Computed: true,
 						},
 					},
 				},
@@ -82,7 +87,7 @@ func dataSourceTrueNASCronjobRead(ctx context.Context, d *schema.ResourceData, m
 	c := m.(*api.Client)
 	id := d.Get("id").(int)
 
-	resp, err := c.CronjobAPI.Get(ctx, id)
+	resp, err := c.CronjobAPI.Get(ctx, strconv.Itoa(id))
 
 	if err != nil {
 		return diag.Errorf("error getting cronjob: %s", err)
