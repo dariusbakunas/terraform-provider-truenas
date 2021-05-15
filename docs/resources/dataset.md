@@ -3,12 +3,12 @@
 page_title: "truenas_dataset Resource - terraform-provider-truenas"
 subcategory: ""
 description: |-
-  
+  A TrueNAS dataset is a file system that is created within a data storage pool. Datasets can contain files, directories (child datasets), and have individual permissions or flags
 ---
 
 # truenas_dataset (Resource)
 
-
+A TrueNAS dataset is a file system that is created within a data storage pool. Datasets can contain files, directories (child datasets), and have individual permissions or flags
 
 ## Example Usage
 
@@ -49,7 +49,7 @@ resource "truenas_dataset" "test" {
 
 ### Required
 
-- **name** (String)
+- **name** (String) Unique identifier for the dataset. Cannot be changed after the dataset is created.
 - **pool** (String)
 
 ### Optional
@@ -57,7 +57,7 @@ resource "truenas_dataset" "test" {
 - **acl_mode** (String) Determine how chmod behaves when adjusting file ACLs. See the zfs(8) aclmode property.
 - **atime** (String) Choose 'on' to update the access time for files when they are read. Choose 'off' to prevent producing log traffic when reading files
 - **case_sensitivity** (String)
-- **comments** (String)
+- **comments** (String) Notes about the dataset.
 - **compression** (String)
 - **copies** (Number)
 - **deduplication** (String)
