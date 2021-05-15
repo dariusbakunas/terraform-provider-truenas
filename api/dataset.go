@@ -117,6 +117,7 @@ type DatasetResponse struct {
 	Available             *CompositeValue `json:"available"`
 	SpecialSmallBlockSize *CompositeValue `json:"special_small_block_size"`
 	PBKDF2Iters           *CompositeValue `json:"pbkdf2iters"`
+	VolSize               *CompositeValue `json:"volsize"`
 	Locked                bool            `json:"locked"`
 }
 

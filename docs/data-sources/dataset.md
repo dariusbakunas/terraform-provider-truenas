@@ -42,6 +42,7 @@ data "truenas_dataset" "dataset" {
 - **inherit_encryption** (Boolean)
 - **key_format** (String)
 - **key_loaded** (Boolean)
+- **locked** (Boolean)
 - **managed_by** (String)
 - **mount_point** (String)
 - **name** (String)

@@ -10,8 +10,8 @@ func TestAccTruenasCronjob_basic(t *testing.T) {
 	resourceName := "data.truenas_cronjob.cj"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCheckTruenasCronjobResource(),

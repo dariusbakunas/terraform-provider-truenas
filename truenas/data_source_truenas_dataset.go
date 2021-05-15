@@ -109,6 +109,10 @@ func dataSourceTrueNASDataset() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 			},
+			"locked": &schema.Schema{
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
 			"key_format": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
@@ -201,6 +205,10 @@ func dataSourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m
 		return diag.Errorf("error getting dataset: %s", err)
 	}
 
+	if resp.Type != "FILESYSTEM" {
+		return diag.Errorf("invalid dataset, %s is %s type", id, resp.Type)
+	}
+
 	dpath := newDatasetPath(id)
 
 	d.Set("pool", dpath.Pool)
@@ -213,6 +221,7 @@ func dataSourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m
 	d.Set("mount_point", resp.MountPoint)
 	d.Set("encryption_root", resp.EncryptionRoot)
 	d.Set("key_loaded", resp.KeyLoaded)
+	d.Set("locked", resp.Locked)
 
 	if resp.ACLMode != nil {
 		if err := d.Set("acl_mode", strings.ToLower(*resp.ACLMode.Value)); err != nil {

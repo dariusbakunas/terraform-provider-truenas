@@ -50,7 +50,7 @@ func (d datasetPath) String() string {
 
 func resourceTrueNASDataset() *schema.Resource {
 	return &schema.Resource{
-		Description: "A TrueNAS dataset is a file system that is created within a data storage pool. Datasets can contain files, directories (child datasets), and have individual permissions or flags",
+		Description:   "A TrueNAS dataset is a file system that is created within a data storage pool. Datasets can contain files, directories (child datasets), and have individual permissions or flags",
 		CreateContext: resourceTrueNASDatasetCreate,
 		ReadContext:   resourceTrueNASDatasetRead,
 		UpdateContext: resourceTrueNASDatasetUpdate,
@@ -78,7 +78,7 @@ func resourceTrueNASDataset() *schema.Resource {
 				ForceNew: true,
 			},
 			"name": &schema.Schema{
-				Description: "Unique identifier for the dataset. Cannot be changed after the dataset is created.",
+				Description:  "Unique identifier for the dataset. Cannot be changed after the dataset is created.",
 				Type:         schema.TypeString,
 				Required:     true,
 				ValidateFunc: validation.StringDoesNotContainAny("/"),
@@ -113,8 +113,8 @@ func resourceTrueNASDataset() *schema.Resource {
 			},
 			"comments": &schema.Schema{
 				Description: "Notes about the dataset.",
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Optional:    true,
 			},
 			"compression": &schema.Schema{
 				Type:         schema.TypeString,
