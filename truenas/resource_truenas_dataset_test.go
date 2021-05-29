@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-func TestAccTruenasDataset_basic(t *testing.T) {
+func TestAccResourceTruenasDataset_basic(t *testing.T) {
 	var dataset api.DatasetResponse
 	pool := "Tank"
 	suffix := acctest.RandStringFromCharSet(5, acctest.CharSetAlphaNum)
@@ -21,10 +21,10 @@ func TestAccTruenasDataset_basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckTruenasDatasetDestroy,
+		CheckDestroy: testAccCheckResourceTruenasDatasetDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckTruenasDatasetResource(pool, name),
+				Config: testAccCheckResourceTruenasDatasetConfig(pool, name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "name", name),
 					resource.TestCheckResourceAttr(resourceName, "comments", "Test dataset"),
@@ -50,7 +50,7 @@ func TestAccTruenasDataset_basic(t *testing.T) {
 	})
 }
 
-func testAccCheckTruenasDatasetDestroy(s *terraform.State) error {
+func testAccCheckResourceTruenasDatasetDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*api.Client)
 
 	// loop through the resources in state, verifying each widget
@@ -107,7 +107,7 @@ func Test_newDatasetPath(t *testing.T) {
 	}
 }
 
-func testAccCheckTruenasDatasetResource(pool string, name string) string {
+func testAccCheckResourceTruenasDatasetConfig(pool string, name string) string {
 	return fmt.Sprintf(`
 	resource "truenas_dataset" "test" {
 		name = "%s"

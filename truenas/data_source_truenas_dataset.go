@@ -193,31 +193,9 @@ func dataSourceTrueNASDataset() *schema.Resource {
 	}
 }
 
-func dataSourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func updateDatasetResourceFromResponse(resp *api.DatasetResponse, d *schema.ResourceData) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	c := m.(*api.Client)
-	id := d.Get("id").(string)
-
-	resp, err := c.DatasetAPI.Get(ctx, id)
-
-	if err != nil {
-		return diag.Errorf("error getting dataset: %s", err)
-	}
-
-	if resp.Type != "FILESYSTEM" {
-		return diag.Errorf("invalid dataset, %s is %s type", id, resp.Type)
-	}
-
-	dpath := newDatasetPath(id)
-
-	d.Set("pool", dpath.Pool)
-
-	if dpath.Parent != "" {
-		d.Set("parent", dpath.Parent)
-	}
-
-	d.Set("name", dpath.Name)
 	d.Set("mount_point", resp.MountPoint)
 	d.Set("encryption_root", resp.EncryptionRoot)
 	d.Set("key_loaded", resp.KeyLoaded)
@@ -463,6 +441,37 @@ func dataSourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m
 	if err := d.Set("encrypted", resp.Encrypted); err != nil {
 		return diag.Errorf("error setting encrypted: %s", err)
 	}
+
+	return diags
+}
+
+func dataSourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	c := m.(*api.Client)
+	id := d.Get("id").(string)
+
+	resp, err := c.DatasetAPI.Get(ctx, id)
+
+	if err != nil {
+		return diag.Errorf("error getting dataset: %s", err)
+	}
+
+	if resp.Type != "FILESYSTEM" {
+		return diag.Errorf("invalid dataset, %s is %s type", id, resp.Type)
+	}
+
+	dpath := newDatasetPath(id)
+
+	d.Set("pool", dpath.Pool)
+
+	if dpath.Parent != "" {
+		d.Set("parent", dpath.Parent)
+	}
+
+	d.Set("name", dpath.Name)
+
+	diags = append(diags, updateDatasetResourceFromResponse(resp, d)...)
 
 	d.SetId(resp.ID)
 

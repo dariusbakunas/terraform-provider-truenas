@@ -529,7 +529,7 @@ func resourceTrueNASDatasetUpdate(ctx context.Context, d *schema.ResourceData, m
 	err := c.DatasetAPI.Update(ctx, d.Id(), input)
 
 	if err != nil {
-		return diag.Errorf("error creating dataset: %s", err)
+		return diag.Errorf("error updating dataset: %s", err)
 	}
 
 	log.Printf("[INFO] TrueNAS dataset (%s) updated", d.Id())

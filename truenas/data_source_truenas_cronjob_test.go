@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestAccTruenasCronjob_basic(t *testing.T) {
+func TestAccDataSourceTruenasCronjob_basic(t *testing.T) {
 	resourceName := "data.truenas_cronjob.cj"
 
 	resource.Test(t, resource.TestCase{
@@ -14,7 +14,7 @@ func TestAccTruenasCronjob_basic(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckTruenasCronjobResource(),
+				Config: testAccCheckDataSourceTruenasCronjobConfig(),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "user", "root"),
 					resource.TestCheckResourceAttr(resourceName, "command", "ls"),
@@ -30,7 +30,7 @@ func TestAccTruenasCronjob_basic(t *testing.T) {
 	})
 }
 
-func testAccCheckTruenasCronjobResource() string {
+func testAccCheckDataSourceTruenasCronjobConfig() string {
 	return fmt.Sprintf(`
 		resource "truenas_cronjob" "cj" {
 			user = "root"
