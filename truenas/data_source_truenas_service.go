@@ -2,7 +2,7 @@ package truenas
 
 import (
 	"context"
-	"github.com/dariusbakunas/terraform-provider-truenas/api"
+	api "github.com/dariusbakunas/truenas-go-sdk"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"strconv"
@@ -49,21 +49,27 @@ func dataSourceTrueNASService() *schema.Resource {
 func dataSourceTrueNASServiceRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	c := m.(*api.Client)
+	c := m.(*api.APIClient)
 	id := d.Get("id").(int)
 
-	resp, err := c.ServiceAPI.Get(ctx, id)
+	resp, _, err := c.ServiceApi.GetService(ctx, int32(id)).Execute()
 
 	if err != nil {
 		return diag.Errorf("error getting service: %s", err)
 	}
 
 	d.Set("name", resp.Service)
-	d.Set("enabled", resp.Enabled)
-	d.Set("pids", flattenInt64List(resp.Pids))
-	d.Set("state", strings.ToLower(resp.State))
+	d.Set("enabled", *resp.Enable)
 
-	d.SetId(strconv.Itoa(resp.ID))
+	if resp.Pids != nil {
+		d.Set("pids", flattenInt32List(*resp.Pids))
+	}
+
+	if resp.State != nil {
+		d.Set("state", strings.ToLower(*resp.State))
+	}
+
+	d.SetId(strconv.Itoa(int(resp.Id)))
 
 	return diags
 }

@@ -1,3 +1,4 @@
 *.tfstate*
 *.lock.hcl
 .terraform
+playground/

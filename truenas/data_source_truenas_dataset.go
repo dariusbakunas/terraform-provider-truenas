@@ -2,7 +2,7 @@ package truenas
 
 import (
 	"context"
-	"github.com/dariusbakunas/terraform-provider-truenas/api"
+	api "github.com/dariusbakunas/truenas-go-sdk"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"strconv"
@@ -193,34 +193,45 @@ func dataSourceTrueNASDataset() *schema.Resource {
 	}
 }
 
-func updateDatasetResourceFromResponse(resp *api.DatasetResponse, d *schema.ResourceData) diag.Diagnostics {
+func updateDatasetResourceFromResponse(resp *api.Dataset, d *schema.ResourceData) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	d.Set("mount_point", resp.MountPoint)
-	d.Set("encryption_root", resp.EncryptionRoot)
-	d.Set("key_loaded", resp.KeyLoaded)
-	d.Set("locked", resp.Locked)
+	if resp.Mountpoint != nil {
+		d.Set("mount_point", *resp.Mountpoint)
+	}
 
-	if resp.ACLMode != nil {
-		if err := d.Set("acl_mode", strings.ToLower(*resp.ACLMode.Value)); err != nil {
+	if resp.EncryptionRoot != nil {
+		d.Set("encryption_root", *resp.EncryptionRoot)
+	}
+
+	if resp.KeyLoaded != nil {
+		d.Set("key_loaded", *resp.KeyLoaded)
+	}
+
+	if resp.Locked != nil {
+		d.Set("locked", *resp.Locked)
+	}
+
+	if resp.Aclmode != nil {
+		if err := d.Set("acl_mode", strings.ToLower(*resp.Aclmode.Value)); err != nil {
 			return diag.Errorf("error setting acl_mode: %s", err)
 		}
 	}
 
-	if resp.ACLType != nil {
-		if err := d.Set("acl_type", strings.ToLower(*resp.ACLType.Value)); err != nil {
+	if resp.Acltype != nil {
+		if err := d.Set("acl_type", strings.ToLower(*resp.Acltype.Value)); err != nil {
 			return diag.Errorf("error setting acl_type: %s", err)
 		}
 	}
 
-	if resp.ATime != nil {
-		if err := d.Set("atime", strings.ToLower(*resp.ATime.Value)); err != nil {
+	if resp.Atime != nil {
+		if err := d.Set("atime", strings.ToLower(*resp.Atime.Value)); err != nil {
 			return diag.Errorf("error setting atime: %s", err)
 		}
 	}
 
-	if resp.CaseSensitivity != nil {
-		if err := d.Set("case_sensitivity", strings.ToLower(*resp.CaseSensitivity.Value)); err != nil {
+	if resp.Casesensitivity != nil {
+		if err := d.Set("case_sensitivity", strings.ToLower(*resp.Casesensitivity.Value)); err != nil {
 			return diag.Errorf("error setting case_sensitivity: %s", err)
 		}
 	}
@@ -256,8 +267,8 @@ func updateDatasetResourceFromResponse(resp *api.DatasetResponse, d *schema.Reso
 		}
 	}
 
-	if resp.ManagedBy != nil {
-		if err := d.Set("managed_by", resp.ManagedBy.Value); err != nil {
+	if resp.Managedby != nil {
+		if err := d.Set("managed_by", resp.Managedby.Value); err != nil {
 			return diag.Errorf("error setting managed_by: %s", err)
 		}
 	}
@@ -275,7 +286,7 @@ func updateDatasetResourceFromResponse(resp *api.DatasetResponse, d *schema.Reso
 	}
 
 	if resp.Quota != nil {
-		quota, err := strconv.Atoi(resp.Quota.RawValue)
+		quota, err := strconv.Atoi(resp.Quota.Rawvalue)
 
 		if err != nil {
 			return diag.Errorf("error parsing quota: %s", err)
@@ -311,7 +322,7 @@ func updateDatasetResourceFromResponse(resp *api.DatasetResponse, d *schema.Reso
 	}
 
 	if resp.Reservation != nil {
-		resrv, err := strconv.Atoi(resp.Reservation.RawValue)
+		resrv, err := strconv.Atoi(resp.Reservation.Rawvalue)
 
 		if err != nil {
 			return diag.Errorf("error parsing reservation: %s", err)
@@ -323,8 +334,8 @@ func updateDatasetResourceFromResponse(resp *api.DatasetResponse, d *schema.Reso
 
 	}
 
-	if resp.RefReservation != nil {
-		resrv, err := strconv.Atoi(resp.RefReservation.RawValue)
+	if resp.Refreservation != nil {
+		resrv, err := strconv.Atoi(resp.Refreservation.Rawvalue)
 
 		if err != nil {
 			return diag.Errorf("error parsing refreservation: %s", err)
@@ -336,8 +347,8 @@ func updateDatasetResourceFromResponse(resp *api.DatasetResponse, d *schema.Reso
 
 	}
 
-	if resp.RefQuota != nil {
-		quota, err := strconv.Atoi(resp.RefQuota.RawValue)
+	if resp.Refquota != nil {
+		quota, err := strconv.Atoi(resp.Refquota.Rawvalue)
 
 		if err != nil {
 			return diag.Errorf("error parsing refquota: %s", err)
@@ -348,8 +359,8 @@ func updateDatasetResourceFromResponse(resp *api.DatasetResponse, d *schema.Reso
 		}
 	}
 
-	if resp.RefQuotaCritical != nil {
-		quota, err := strconv.Atoi(*resp.RefQuotaCritical.Value)
+	if resp.RefquotaCritical != nil {
+		quota, err := strconv.Atoi(*resp.RefquotaCritical.Value)
 
 		if err != nil {
 			return diag.Errorf("error parsing refquota_critical: %s", err)
@@ -360,8 +371,8 @@ func updateDatasetResourceFromResponse(resp *api.DatasetResponse, d *schema.Reso
 		}
 	}
 
-	if resp.RefQuotaWarning != nil {
-		quota, err := strconv.Atoi(*resp.RefQuotaWarning.Value)
+	if resp.RefquotaWarning != nil {
+		quota, err := strconv.Atoi(*resp.RefquotaWarning.Value)
 
 		if err != nil {
 			return diag.Errorf("error parsing refquota_warning: %s", err)
@@ -383,7 +394,7 @@ func updateDatasetResourceFromResponse(resp *api.DatasetResponse, d *schema.Reso
 			return diag.Errorf("error setting record_size: %s", err)
 		}
 
-		sz, err := strconv.Atoi(resp.Recordsize.RawValue)
+		sz, err := strconv.Atoi(resp.Recordsize.Rawvalue)
 
 		if err != nil {
 			return diag.Errorf("error parsing recordsize rawvalue: %s", err)
@@ -400,8 +411,8 @@ func updateDatasetResourceFromResponse(resp *api.DatasetResponse, d *schema.Reso
 		}
 	}
 
-	if resp.SnapDir != nil {
-		if err := d.Set("snap_dir", strings.ToLower(*resp.SnapDir.Value)); err != nil {
+	if resp.Snapdir != nil {
+		if err := d.Set("snap_dir", strings.ToLower(*resp.Snapdir.Value)); err != nil {
 			return diag.Errorf("error setting snap_dir: %s", err)
 		}
 	}
@@ -412,8 +423,8 @@ func updateDatasetResourceFromResponse(resp *api.DatasetResponse, d *schema.Reso
 		}
 	}
 
-	if resp.PBKDF2Iters != nil {
-		iters, err := strconv.Atoi(*resp.PBKDF2Iters.Value)
+	if resp.Pbkdf2iters != nil {
+		iters, err := strconv.Atoi(*resp.Pbkdf2iters.Value)
 
 		if err != nil {
 			return diag.Errorf("error parsing PBKDF2Iters: %s", err)
@@ -432,14 +443,14 @@ func updateDatasetResourceFromResponse(resp *api.DatasetResponse, d *schema.Reso
 		}
 	}
 
-	if resp.XATTR != nil {
-		if err := d.Set("xattr", strings.ToLower(*resp.XATTR.Value)); err != nil {
+	if resp.Xattr != nil {
+		if err := d.Set("xattr", strings.ToLower(*resp.Xattr.Value)); err != nil {
 			return diag.Errorf("error setting xattr: %s", err)
 		}
 	}
 
-	if err := d.Set("encrypted", resp.Encrypted); err != nil {
-		return diag.Errorf("error setting encrypted: %s", err)
+	if resp.Encrypted != nil {
+		d.Set("encrypted", *resp.Encrypted)
 	}
 
 	return diags
@@ -448,10 +459,10 @@ func updateDatasetResourceFromResponse(resp *api.DatasetResponse, d *schema.Reso
 func dataSourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	c := m.(*api.Client)
+	c := m.(*api.APIClient)
 	id := d.Get("id").(string)
 
-	resp, err := c.DatasetAPI.Get(ctx, id)
+	resp, _, err := c.DatasetApi.GetDataset(ctx, id).Execute()
 
 	if err != nil {
 		return diag.Errorf("error getting dataset: %s", err)
@@ -471,9 +482,9 @@ func dataSourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m
 
 	d.Set("name", dpath.Name)
 
-	diags = append(diags, updateDatasetResourceFromResponse(resp, d)...)
+	diags = append(diags, updateDatasetResourceFromResponse(&resp, d)...)
 
-	d.SetId(resp.ID)
+	d.SetId(resp.Id)
 
 	return diags
 }

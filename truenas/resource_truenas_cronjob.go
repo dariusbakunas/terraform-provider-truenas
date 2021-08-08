@@ -2,7 +2,7 @@ package truenas
 
 import (
 	"context"
-	"github.com/dariusbakunas/terraform-provider-truenas/api"
+	api "github.com/dariusbakunas/truenas-go-sdk"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"strconv"
@@ -96,24 +96,41 @@ func resourceTrueNASCronjob() *schema.Resource {
 func resourceTrueNASCronjobRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	c := m.(*api.Client)
-	id := d.Id()
+	c := m.(*api.APIClient)
 
-	resp, err := c.CronjobAPI.Get(ctx, id)
+	id, err := strconv.Atoi(d.Id())
+
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	resp, _, err := c.CronjobApi.GetCronJob(ctx, int32(id)).Execute()
 
 	if err != nil {
 		return diag.Errorf("error getting cronjob: %s", err)
 	}
 
-	d.Set("id", strconv.Itoa(resp.ID))
-	d.Set("user", resp.User)
-	d.Set("command", resp.Command)
-	d.Set("description", resp.Description)
-	d.Set("enabled", resp.Enabled)
-	d.Set("hide_stdout", resp.STDOUT)
-	d.Set("hide_stderr", resp.STDERR)
+	d.Set("id", strconv.Itoa(int(*resp.Id)))
+	d.Set("user", *resp.User)
+	d.Set("command", *resp.Command)
 
-	if err := d.Set("schedule", flattenSchedule(resp.Schedule)); err != nil {
+	if resp.Description != nil {
+		d.Set("description", *resp.Description)
+	}
+
+	if resp.Enabled != nil {
+		d.Set("enabled", *resp.Enabled)
+	}
+
+	if resp.Stdout != nil {
+		d.Set("hide_stdout", *resp.Stdout)
+	}
+
+	if resp.Stderr != nil {
+		d.Set("hide_stderr", resp.Stderr)
+	}
+
+	if err := d.Set("schedule", flattenSchedule(*resp.Schedule)); err != nil {
 		return diag.Errorf("error setting schedule: %s", err)
 	}
 
@@ -121,26 +138,37 @@ func resourceTrueNASCronjobRead(ctx context.Context, d *schema.ResourceData, m i
 }
 
 func resourceTrueNASCronjobCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*api.Client)
+	c := m.(*api.APIClient)
 	job := expandJobInput(d)
 
-	resp, err := c.CronjobAPI.Create(ctx, job)
+	resp, r, err := c.CronjobApi.CreateCronJob(ctx).
+		CreateCronjobParams(job).
+		Execute()
 
 	if err != nil {
-		return diag.Errorf("error creating cronjob: %s", err)
+		if r != nil {
+			return diag.Errorf("error creating cronjob: %s - %s", err, r.Status)
+		} else {
+			return diag.Errorf("error creating cronjob: %s", err)
+		}
 	}
 
-	d.SetId(strconv.Itoa(resp.ID))
+	d.SetId(strconv.Itoa(int(*resp.Id)))
 
 	return resourceTrueNASCronjobRead(ctx, d, m)
 }
 
 func resourceTrueNASCronjobUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*api.Client)
+	c := m.(*api.APIClient)
 	job := expandJobInput(d)
-	id := d.Id()
 
-	_, err := c.CronjobAPI.Update(ctx, id, job)
+	id, err := strconv.Atoi(d.Id())
+
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	_, _, err = c.CronjobApi.UpdateCronJob(ctx, int32(id)).CreateCronjobParams(job).Execute()
 
 	if err != nil {
 		return diag.Errorf("error updating cronjob: %s", err)
@@ -152,10 +180,15 @@ func resourceTrueNASCronjobUpdate(ctx context.Context, d *schema.ResourceData, m
 func resourceTrueNASCronjobDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	c := m.(*api.Client)
-	id := d.Id()
+	c := m.(*api.APIClient)
 
-	err := c.CronjobAPI.Delete(ctx, id)
+	id, err := strconv.Atoi(d.Id())
+
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	_, err = c.CronjobApi.DeleteCronJob(ctx, int32(id)).Execute()
 
 	if err != nil {
 		return diag.Errorf("error deleting cronjob: %s", err)
@@ -164,14 +197,14 @@ func resourceTrueNASCronjobDelete(ctx context.Context, d *schema.ResourceData, m
 	return diags
 }
 
-func expandJobInput(d *schema.ResourceData) *api.JobInput {
-	job := &api.JobInput{
+func expandJobInput(d *schema.ResourceData) api.CreateCronjobParams {
+	job := api.CreateCronjobParams{
 		Command: d.Get("command").(string),
 		User:    d.Get("user").(string),
 	}
 
 	if description, ok := d.GetOk("description"); ok {
-		job.Description = description.(string)
+		job.Description = getStringPtr(description.(string))
 	}
 
 	if schedule, ok := d.GetOk("schedule"); ok {
@@ -187,20 +220,20 @@ func expandJobInput(d *schema.ResourceData) *api.JobInput {
 	stdout := d.Get("hide_stdout")
 
 	if stdout != nil {
-		job.STDOUT = getBoolPtr(stdout.(bool))
+		job.Stdout = getBoolPtr(stdout.(bool))
 	}
 
 	stderr := d.Get("hide_stderr")
 
 	if stderr != nil {
-		job.STDERR = getBoolPtr(stderr.(bool))
+		job.Stderr = getBoolPtr(stderr.(bool))
 	}
 
 	return job
 }
 
-func expandJobSchedule(s []interface{}) *api.JobSchedule {
-	schedule := &api.JobSchedule{}
+func expandJobSchedule(s []interface{}) *api.CronJobSchedule {
+	schedule := &api.CronJobSchedule{}
 
 	if len(s) == 0 || s[0] == nil {
 		return nil
@@ -208,11 +241,11 @@ func expandJobSchedule(s []interface{}) *api.JobSchedule {
 
 	mSchedule := s[0].(map[string]interface{})
 
-	schedule.Minute = mSchedule["minute"].(string)
-	schedule.Hour = mSchedule["hour"].(string)
-	schedule.Dom = mSchedule["dom"].(string)
-	schedule.Month = mSchedule["month"].(string)
-	schedule.Dow = mSchedule["dow"].(string)
+	schedule.Minute = getStringPtr(mSchedule["minute"].(string))
+	schedule.Hour = getStringPtr(mSchedule["hour"].(string))
+	schedule.Dom = getStringPtr(mSchedule["dom"].(string))
+	schedule.Month = getStringPtr(mSchedule["month"].(string))
+	schedule.Dow = getStringPtr(mSchedule["dow"].(string))
 
 	return schedule
 }

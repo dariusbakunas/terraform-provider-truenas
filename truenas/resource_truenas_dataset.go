@@ -3,7 +3,7 @@ package truenas
 import (
 	"context"
 	"fmt"
-	"github.com/dariusbakunas/terraform-provider-truenas/api"
+	api "github.com/dariusbakunas/truenas-go-sdk"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
@@ -267,21 +267,21 @@ func resourceTrueNASDataset() *schema.Resource {
 func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	c := m.(*api.Client)
+	c := m.(*api.APIClient)
 
 	input := flattenDataset(d)
 
 	log.Printf("[DEBUG] Creating TrueNAS dataset: %+v", input)
 
-	resp, err := c.DatasetAPI.Create(ctx, input)
+	resp, _, err := c.DatasetApi.CreateDataset(ctx).CreateDatasetParams(input).Execute()
 
 	if err != nil {
 		return diag.Errorf("error creating dataset: %s", err)
 	}
 
-	d.SetId(resp.ID)
+	d.SetId(resp.Id)
 
-	log.Printf("[INFO] TrueNAS dataset (%s) created", resp.ID)
+	log.Printf("[INFO] TrueNAS dataset (%s) created", resp.Id)
 
 	return append(diags, resourceTrueNASDatasetRead(ctx, d, m)...)
 }
@@ -289,19 +289,19 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	c := m.(*api.Client)
+	c := m.(*api.APIClient)
 
 	id := d.Id()
 
-	resp, err := c.DatasetAPI.Get(ctx, id)
+	resp, _, err := c.DatasetApi.GetDataset(ctx, id).Execute()
 
 	if err != nil {
 		return diag.Errorf("error getting dataset: %s", err)
 	}
 
-	dpath := newDatasetPath(resp.ID)
+	dpath := newDatasetPath(resp.Id)
 
-	if err := d.Set("id", resp.ID); err != nil {
+	if err := d.Set("id", resp.Id); err != nil {
 		return diag.Errorf("error setting id: %s", err)
 	}
 
@@ -317,66 +317,68 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 		return diag.Errorf("error setting name: %s", err)
 	}
 
-	if err := d.Set("mount_point", resp.MountPoint); err != nil {
-		return diag.Errorf("error setting mount_point: %s", err)
+	if resp.Mountpoint != nil {
+		if err := d.Set("mount_point", *resp.Mountpoint); err != nil {
+			return diag.Errorf("error setting mount_point: %s", err)
+		}
 	}
 
-	if resp.ACLMode != nil {
-		if err := d.Set("acl_mode", strings.ToLower(*resp.ACLMode.Value)); err != nil {
+	if resp.Aclmode != nil && resp.Aclmode.Value != nil {
+		if err := d.Set("acl_mode", strings.ToLower(*resp.Aclmode.Value)); err != nil {
 			return diag.Errorf("error setting acl_mode: %s", err)
 		}
 	}
 
-	if resp.ACLType != nil {
-		if err := d.Set("acl_type", strings.ToLower(*resp.ACLType.Value)); err != nil {
+	if resp.Acltype != nil && resp.Acltype.Value != nil {
+		if err := d.Set("acl_type", strings.ToLower(*resp.Acltype.Value)); err != nil {
 			return diag.Errorf("error setting acl_type: %s", err)
 		}
 	}
 
-	if resp.ATime != nil {
-		if err := d.Set("atime", strings.ToLower(*resp.ATime.Value)); err != nil {
+	if resp.Atime != nil && resp.Atime.Value != nil {
+		if err := d.Set("atime", strings.ToLower(*resp.Atime.Value)); err != nil {
 			return diag.Errorf("error setting atime: %s", err)
 		}
 	}
 
-	if resp.CaseSensitivity != nil {
-		if err := d.Set("case_sensitivity", strings.ToLower(*resp.CaseSensitivity.Value)); err != nil {
+	if resp.Casesensitivity != nil && resp.Casesensitivity.Value != nil {
+		if err := d.Set("case_sensitivity", strings.ToLower(*resp.Casesensitivity.Value)); err != nil {
 			return diag.Errorf("error setting case_sensitivity: %s", err)
 		}
 	}
 
-	if resp.Comments != nil {
+	if resp.Comments != nil && resp.Comments.Value != nil {
 		// TrueNAS does not seem to change comments case in any way
 		if err := d.Set("comments", resp.Comments.Value); err != nil {
 			return diag.Errorf("error setting comments: %s", err)
 		}
 	}
 
-	if resp.Compression != nil {
+	if resp.Compression != nil && resp.Compression.Value != nil {
 		if err := d.Set("compression", strings.ToLower(*resp.Compression.Value)); err != nil {
 			return diag.Errorf("error setting compression: %s", err)
 		}
 	}
 
-	if resp.Deduplication != nil {
+	if resp.Deduplication != nil && resp.Deduplication.Value != nil {
 		if err := d.Set("deduplication", strings.ToLower(*resp.Deduplication.Value)); err != nil {
 			return diag.Errorf("error setting deduplication: %s", err)
 		}
 	}
 
-	if resp.Exec != nil {
+	if resp.Exec != nil && resp.Exec.Value != nil {
 		if err := d.Set("exec", strings.ToLower(*resp.Exec.Value)); err != nil {
 			return diag.Errorf("error setting exec: %s", err)
 		}
 	}
 
-	if resp.ManagedBy != nil {
-		if err := d.Set("managed_by", resp.ManagedBy.Value); err != nil {
+	if resp.Managedby != nil && resp.Managedby.Value != nil {
+		if err := d.Set("managed_by", *resp.Managedby.Value); err != nil {
 			return diag.Errorf("error setting managed_by: %s", err)
 		}
 	}
 
-	if resp.Copies != nil {
+	if resp.Copies != nil && resp.Copies.Value != nil {
 		copies, err := strconv.Atoi(*resp.Copies.Value)
 
 		if err != nil {
@@ -389,7 +391,7 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 	}
 
 	if resp.Quota != nil {
-		quota, err := strconv.Atoi(resp.Quota.RawValue)
+		quota, err := strconv.Atoi(resp.Quota.Rawvalue)
 
 		if err != nil {
 			return diag.Errorf("error parsing quota: %s", err)
@@ -400,7 +402,7 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 		}
 	}
 
-	if resp.QuotaCritical != nil {
+	if resp.QuotaCritical != nil && resp.QuotaCritical.Value != nil {
 		quota, err := strconv.Atoi(*resp.QuotaCritical.Value)
 
 		if err != nil {
@@ -412,7 +414,7 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 		}
 	}
 
-	if resp.QuotaWarning != nil {
+	if resp.QuotaWarning != nil && resp.QuotaWarning.Value != nil {
 		quota, err := strconv.Atoi(*resp.QuotaWarning.Value)
 
 		if err != nil {
@@ -424,8 +426,8 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 		}
 	}
 
-	if resp.RefQuota != nil {
-		quota, err := strconv.Atoi(resp.RefQuota.RawValue)
+	if resp.Refquota != nil {
+		quota, err := strconv.Atoi(resp.Refquota.Rawvalue)
 
 		if err != nil {
 			return diag.Errorf("error parsing refquota: %s", err)
@@ -436,8 +438,8 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 		}
 	}
 
-	if resp.RefQuotaCritical != nil {
-		quota, err := strconv.Atoi(*resp.RefQuotaCritical.Value)
+	if resp.RefquotaCritical != nil && resp.RefquotaCritical.Value != nil {
+		quota, err := strconv.Atoi(*resp.RefquotaCritical.Value)
 
 		if err != nil {
 			return diag.Errorf("error parsing refquota_critical: %s", err)
@@ -448,8 +450,8 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 		}
 	}
 
-	if resp.RefQuotaWarning != nil {
-		quota, err := strconv.Atoi(*resp.RefQuotaWarning.Value)
+	if resp.RefquotaWarning != nil && resp.RefquotaWarning.Value != nil {
+		quota, err := strconv.Atoi(*resp.RefquotaWarning.Value)
 
 		if err != nil {
 			return diag.Errorf("error parsing refquota_warning: %s", err)
@@ -460,23 +462,24 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 		}
 	}
 
-	if resp.Readonly != nil {
+	if resp.Readonly != nil && resp.Readonly.Value != nil {
 		if err := d.Set("readonly", strings.ToLower(*resp.Readonly.Value)); err != nil {
 			return diag.Errorf("error setting readonly: %s", err)
 		}
 	}
 
-	if resp.Recordsize != nil {
+	if resp.Recordsize != nil && resp.Recordsize.Value != nil {
 		if err := d.Set("record_size", *resp.Recordsize.Value); err != nil {
 			return diag.Errorf("error setting record_size: %s", err)
 		}
 	}
 
-	if resp.ShareType != nil {
-		if err := d.Set("share_type", strings.ToLower(*resp.ShareType.Value)); err != nil {
-			return diag.Errorf("error setting share_type: %s", err)
-		}
-	}
+	// TODO: doublecheck, does not seem to be ever returned
+	//if resp.ShareType != nil {
+	//	if err := d.Set("share_type", strings.ToLower(*resp.ShareType.Value)); err != nil {
+	//		return diag.Errorf("error setting share_type: %s", err)
+	//	}
+	//}
 
 	if resp.Sync != nil {
 		if err := d.Set("sync", strings.ToLower(*resp.Sync.Value)); err != nil {
@@ -484,8 +487,8 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 		}
 	}
 
-	if resp.SnapDir != nil {
-		if err := d.Set("snap_dir", strings.ToLower(*resp.SnapDir.Value)); err != nil {
+	if resp.Snapdir != nil && resp.Snapdir.Value != nil {
+		if err := d.Set("snap_dir", strings.ToLower(*resp.Snapdir.Value)); err != nil {
 			return diag.Errorf("error setting snap_dir: %s", err)
 		}
 	}
@@ -496,8 +499,8 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 		}
 	}
 
-	if resp.PBKDF2Iters != nil {
-		iters, err := strconv.Atoi(*resp.PBKDF2Iters.Value)
+	if resp.Pbkdf2iters != nil && resp.Pbkdf2iters.Value != nil {
+		iters, err := strconv.Atoi(*resp.Pbkdf2iters.Value)
 
 		if err != nil {
 			return diag.Errorf("error parsing PBKDF2Iters: %s", err)
@@ -520,13 +523,13 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 func resourceTrueNASDatasetUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	c := m.(*api.Client)
+	c := m.(*api.APIClient)
 
 	input := flattenDatasetForUpdate(d)
 
 	log.Printf("[DEBUG] Updating TrueNAS dataset: %+v", input)
 
-	err := c.DatasetAPI.Update(ctx, d.Id(), input)
+	_, _, err := c.DatasetApi.UpdateDataset(ctx, d.Id()).UpdateDatasetParams(input).Execute()
 
 	if err != nil {
 		return diag.Errorf("error updating dataset: %s", err)
@@ -540,12 +543,12 @@ func resourceTrueNASDatasetUpdate(ctx context.Context, d *schema.ResourceData, m
 func resourceTrueNASDatasetDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	c := m.(*api.Client)
+	c := m.(*api.APIClient)
 	id := d.Id()
 
 	log.Printf("[DEBUG] Deleting TrueNAS dataset: %s", id)
 
-	err := c.DatasetAPI.Delete(ctx, id)
+	_, err := c.DatasetApi.DeleteDataset(ctx, id).Execute()
 
 	if err != nil {
 		return diag.Errorf("error deleting dataset: %s", err)
@@ -556,97 +559,97 @@ func resourceTrueNASDatasetDelete(ctx context.Context, d *schema.ResourceData, m
 	return diags
 }
 
-func flattenDataset(d *schema.ResourceData) *api.CreateDatasetInput {
+func flattenDataset(d *schema.ResourceData) api.CreateDatasetParams {
 	p := datasetPath{
 		Pool:   d.Get("pool").(string),
 		Parent: d.Get("parent").(string),
 		Name:   d.Get("name").(string),
 	}
 
-	input := &api.CreateDatasetInput{
+	input := api.CreateDatasetParams{
 		Name: p.String(),
 	}
 
 	if sync, ok := d.GetOk("sync"); ok {
-		input.Sync = strings.ToUpper(sync.(string))
+		input.Sync = getStringPtr(strings.ToUpper(sync.(string)))
 	}
 
 	if caseSensitivity, ok := d.GetOk("case_sensitivity"); ok {
-		input.CaseSensitivity = strings.ToUpper(caseSensitivity.(string))
+		input.Casesensitivity = getStringPtr(strings.ToUpper(caseSensitivity.(string)))
 	}
 
 	if comments, ok := d.GetOk("comments"); ok {
-		input.Comments = comments.(string)
+		input.Comments = getStringPtr(comments.(string))
 	}
 
 	if compression, ok := d.GetOk("compression"); ok {
-		input.Compression = strings.ToUpper(compression.(string))
+		input.Compression = getStringPtr(strings.ToUpper(compression.(string)))
 	}
 
 	if deduplication, ok := d.GetOk("deduplication"); ok {
-		input.Deduplication = strings.ToUpper(deduplication.(string))
+		input.Deduplication = getStringPtr(strings.ToUpper(deduplication.(string)))
 	}
 
 	if copies, ok := d.GetOk("copies"); ok {
-		input.Copies = copies.(int)
+		input.Copies = getInt32Ptr(int32(copies.(int)))
 	}
 
 	if exec, ok := d.GetOk("exec"); ok {
-		input.Exec = strings.ToUpper(exec.(string))
+		input.Exec = getStringPtr(strings.ToUpper(exec.(string)))
 	}
 
 	if aclmode, ok := d.GetOk("acl_mode"); ok {
-		input.ACLMode = strings.ToUpper(aclmode.(string))
+		input.Aclmode = getStringPtr(strings.ToUpper(aclmode.(string)))
 	}
 
 	if atime, ok := d.GetOk("atime"); ok {
-		input.ATime = strings.ToUpper(atime.(string))
+		input.Atime = getStringPtr(strings.ToUpper(atime.(string)))
 	}
 
 	if quota, ok := d.GetOk("quota_bytes"); ok {
-		input.Quota = quota.(int)
+		input.Quota = getInt64Ptr(int64(quota.(int)))
 	}
 
 	if quotaCritical, ok := d.GetOk("quota_critical"); ok {
-		input.QuotaCritical = getIntPtr(quotaCritical.(int))
+		input.QuotaCritical = getInt64Ptr(int64(quotaCritical.(int)))
 	}
 
 	if quotaWarning, ok := d.GetOk("quota_warning"); ok {
-		input.QuotaWarning = getIntPtr(quotaWarning.(int))
+		input.QuotaWarning = getInt64Ptr(int64(quotaWarning.(int)))
 	}
 
 	if refQuota, ok := d.GetOk("ref_quota_bytes"); ok {
-		input.RefQuota = refQuota.(int)
+		input.Refquota = getInt64Ptr(int64(refQuota.(int)))
 	}
 
 	if refQuotaCritical, ok := d.GetOk("ref_quota_critical"); ok {
-		input.RefQuotaCritical = getIntPtr(refQuotaCritical.(int))
+		input.RefquotaCritical = getInt64Ptr(int64(refQuotaCritical.(int)))
 	}
 
 	if refQuotaWarning, ok := d.GetOk("ref_quota_warning"); ok {
-		input.RefQuotaWarning = getIntPtr(refQuotaWarning.(int))
+		input.RefquotaWarning = getInt64Ptr(int64(refQuotaWarning.(int)))
 	}
 
 	if readonly, ok := d.GetOk("readonly"); ok {
-		input.Readonly = strings.ToUpper(readonly.(string))
+		input.Readonly = getStringPtr(strings.ToUpper(readonly.(string)))
 	}
 
 	if recordSize, ok := d.GetOk("record_size"); ok {
-		input.RecordSize = strings.ToUpper(recordSize.(string))
+		input.Recordsize = getStringPtr(strings.ToUpper(recordSize.(string)))
 	}
 
 	if shareType, ok := d.GetOk("share_type"); ok {
-		input.ShareType = strings.ToUpper(shareType.(string))
+		input.ShareType = getStringPtr(strings.ToUpper(shareType.(string)))
 	}
 
 	if snapDir, ok := d.GetOk("snap_dir"); ok {
-		input.SnapDir = strings.ToUpper(snapDir.(string))
+		input.Snapdir = getStringPtr(strings.ToUpper(snapDir.(string)))
 	}
 
 	encrypted := d.Get("encrypted")
 
 	if encrypted != nil {
-		input.Encrypted = getBoolPtr(encrypted.(bool))
+		input.Encryption = getBoolPtr(encrypted.(bool))
 	}
 
 	inheritEncryption := d.Get("inherit_encryption")
@@ -655,10 +658,10 @@ func flattenDataset(d *schema.ResourceData) *api.CreateDatasetInput {
 		input.InheritEncryption = getBoolPtr(inheritEncryption.(bool))
 	}
 
-	encOptions := &api.EncryptionOptions{}
+	encOptions := &api.CreateDatasetParamsEncryptionOptions{}
 
 	if algorithm, ok := d.GetOk("encryption_algorithm"); ok {
-		encOptions.Algorithm = algorithm.(string)
+		encOptions.Algorithm = getStringPtr(algorithm.(string))
 	}
 
 	if genKey, ok := d.GetOk("generate_key"); ok {
@@ -666,74 +669,72 @@ func flattenDataset(d *schema.ResourceData) *api.CreateDatasetInput {
 	}
 
 	if passphrase, ok := d.GetOk("passphrase"); ok {
-		encOptions.Passphrase = passphrase.(string)
+		encOptions.Passphrase = getStringPtr(passphrase.(string))
 	}
 
 	if key, ok := d.GetOk("encryption_key"); ok {
-		encOptions.Key = key.(string)
+		encOptions.Key = getStringPtr(key.(string))
 	}
 
-	if (api.EncryptionOptions{}) != *encOptions {
-		input.EncryptionOptions = encOptions
-	}
+	input.EncryptionOptions = encOptions
 
-	input.Type = datasetType
+	input.Type = getStringPtr(datasetType)
 	return input
 }
 
-func flattenDatasetForUpdate(d *schema.ResourceData) *api.UpdateDatasetInput {
-	input := &api.UpdateDatasetInput{}
+func flattenDatasetForUpdate(d *schema.ResourceData) api.UpdateDatasetParams {
+	input := api.UpdateDatasetParams{}
 
 	if sync, ok := d.GetOk("sync"); ok {
-		input.Sync = strings.ToUpper(sync.(string))
+		input.Sync = getStringPtr(strings.ToUpper(sync.(string)))
 	}
 
 	if comments, ok := d.GetOk("comments"); ok {
-		input.Comments = comments.(string)
+		input.Comments = getStringPtr(comments.(string))
 	}
 
 	if compression, ok := d.GetOk("compression"); ok {
-		input.Compression = strings.ToUpper(compression.(string))
+		input.Compression = getStringPtr(strings.ToUpper(compression.(string)))
 	}
 
 	if deduplication, ok := d.GetOk("deduplication"); ok {
-		input.Deduplication = strings.ToUpper(deduplication.(string))
+		input.Deduplication = getStringPtr(strings.ToUpper(deduplication.(string)))
 	}
 
 	if copies, ok := d.GetOk("copies"); ok {
-		input.Copies = copies.(int)
+		input.Copies = getInt32Ptr(int32(copies.(int)))
 	}
 
 	if exec, ok := d.GetOk("exec"); ok {
-		input.Exec = strings.ToUpper(exec.(string))
+		input.Exec = getStringPtr(strings.ToUpper(exec.(string)))
 	}
 
 	if aclmode, ok := d.GetOk("acl_mode"); ok {
-		input.ACLMode = strings.ToUpper(aclmode.(string))
+		input.Aclmode = getStringPtr(strings.ToUpper(aclmode.(string)))
 	}
 
 	if atime, ok := d.GetOk("atime"); ok {
-		input.ATime = strings.ToUpper(atime.(string))
+		input.Atime = getStringPtr(strings.ToUpper(atime.(string)))
 	}
 
 	if quota, ok := d.GetOk("quota_bytes"); ok {
-		input.Quota = quota.(int)
+		input.Quota = getInt64Ptr(int64(quota.(int)))
 	}
 
 	if refQuota, ok := d.GetOk("ref_quota_bytes"); ok {
-		input.RefQuota = refQuota.(int)
+		input.Refquota = getInt64Ptr(int64(refQuota.(int)))
 	}
 
 	if readonly, ok := d.GetOk("readonly"); ok {
-		input.Readonly = strings.ToUpper(readonly.(string))
+		input.Readonly = getStringPtr(strings.ToUpper(readonly.(string)))
 	}
 
 	if recordSize, ok := d.GetOk("record_size"); ok {
-		input.RecordSize = strings.ToUpper(recordSize.(string))
+		input.Recordsize = getStringPtr(strings.ToUpper(recordSize.(string)))
 	}
 
 	if snapDir, ok := d.GetOk("snap_dir"); ok {
-		input.SnapDir = strings.ToUpper(snapDir.(string))
+		input.Snapdir = getStringPtr(strings.ToUpper(snapDir.(string)))
 	}
 
 	return input

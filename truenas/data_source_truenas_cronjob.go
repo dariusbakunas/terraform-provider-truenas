@@ -2,7 +2,7 @@ package truenas
 
 import (
 	"context"
-	"github.com/dariusbakunas/terraform-provider-truenas/api"
+	api "github.com/dariusbakunas/truenas-go-sdk"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"strconv"
@@ -84,40 +84,69 @@ func dataSourceTrueNASCronjob() *schema.Resource {
 func dataSourceTrueNASCronjobRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	c := m.(*api.Client)
-	id := d.Get("id").(string)
+	c := m.(*api.APIClient)
+	id, err := strconv.Atoi(d.Get("id").(string))
 
-	resp, err := c.CronjobAPI.Get(ctx, id)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	resp, _, err := c.CronjobApi.GetCronJob(ctx, int32(id)).Execute()
 
 	if err != nil {
 		return diag.Errorf("error getting cronjob: %s", err)
 	}
 
-	d.Set("user", resp.User)
-	d.Set("command", resp.Command)
-	d.Set("description", resp.Description)
-	d.Set("enabled", resp.Enabled)
-	d.Set("hide_stdout", resp.STDOUT)
-	d.Set("hide_stderr", resp.STDERR)
-
-	if err := d.Set("schedule", flattenSchedule(resp.Schedule)); err != nil {
-		return diag.Errorf("error setting schedule: %s", err)
+	if resp.User != nil {
+		d.Set("user", *resp.User)
 	}
 
-	d.SetId(strconv.Itoa(resp.ID))
+	if resp.Command != nil {
+		d.Set("command", *resp.Command)
+	}
+
+	if resp.Description != nil {
+		d.Set("description", *resp.Description)
+	}
+
+	d.Set("enabled", *resp.Enabled)
+	d.Set("hide_stdout", *resp.Stdout)
+	d.Set("hide_stderr", *resp.Stderr)
+
+	if resp.Schedule != nil {
+		if err := d.Set("schedule", flattenSchedule(*resp.Schedule)); err != nil {
+			return diag.Errorf("error setting schedule: %s", err)
+		}
+	}
+
+	d.SetId(strconv.Itoa(int(*resp.Id)))
 
 	return diags
 }
 
-func flattenSchedule(s api.JobSchedule) []interface{} {
+func flattenSchedule(s api.CronJobSchedule) []interface{} {
 	var res []interface{}
 
-	schedule := map[string]interface{}{
-		"minute": s.Minute,
-		"hour":   s.Hour,
-		"dom":    s.Dom,
-		"month":  s.Month,
-		"dow":    s.Dow,
+	schedule := map[string]interface{}{}
+
+	if s.Minute != nil {
+		schedule["minute"] = *s.Minute
+	}
+
+	if s.Hour != nil {
+		schedule["hour"] = *s.Hour
+	}
+
+	if s.Dom != nil {
+		schedule["dom"] = *s.Dom
+	}
+
+	if s.Month != nil {
+		schedule["month"] = *s.Month
+	}
+
+	if s.Dow != nil {
+		schedule["dow"] = *s.Dow
 	}
 
 	res = append(res, schedule)

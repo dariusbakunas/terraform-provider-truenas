@@ -2,7 +2,7 @@ package truenas
 
 import (
 	"context"
-	"github.com/dariusbakunas/terraform-provider-truenas/api"
+	api "github.com/dariusbakunas/truenas-go-sdk"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"strconv"
@@ -95,10 +95,10 @@ func dataSourceTrueNASZVOL() *schema.Resource {
 func dataSourceTrueNASZVOLRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	c := m.(*api.Client)
+	c := m.(*api.APIClient)
 	id := d.Get("id").(string)
 
-	resp, err := c.DatasetAPI.Get(ctx, id)
+	resp, _, err := c.DatasetApi.GetDataset(ctx, id).Execute()
 
 	if err != nil {
 		return diag.Errorf("error getting dataset: %s", err)
@@ -117,9 +117,18 @@ func dataSourceTrueNASZVOLRead(ctx context.Context, d *schema.ResourceData, m in
 	}
 
 	d.Set("name", dpath.Name)
-	d.Set("encryption_root", resp.EncryptionRoot)
-	d.Set("key_loaded", resp.KeyLoaded)
-	d.Set("locked", resp.Locked)
+
+	if resp.EncryptionRoot != nil {
+		d.Set("encryption_root", resp.EncryptionRoot)
+	}
+
+	if resp.KeyLoaded != nil {
+		d.Set("key_loaded", resp.KeyLoaded)
+	}
+
+	if resp.Locked != nil {
+		d.Set("locked", resp.Locked)
+	}
 
 	if resp.Comments != nil {
 		// TrueNAS does not seem to change comments case in any way
@@ -159,7 +168,7 @@ func dataSourceTrueNASZVOLRead(ctx context.Context, d *schema.ResourceData, m in
 	}
 
 	if resp.Reservation != nil {
-		resrv, err := strconv.Atoi(resp.Reservation.RawValue)
+		resrv, err := strconv.Atoi(resp.Reservation.Rawvalue)
 
 		if err != nil {
 			return diag.Errorf("error parsing reservation: %s", err)
@@ -170,8 +179,8 @@ func dataSourceTrueNASZVOLRead(ctx context.Context, d *schema.ResourceData, m in
 		}
 	}
 
-	if resp.RefReservation != nil {
-		resrv, err := strconv.Atoi(resp.RefReservation.RawValue)
+	if resp.Refreservation != nil {
+		resrv, err := strconv.Atoi(resp.Refreservation.Rawvalue)
 
 		if err != nil {
 			return diag.Errorf("error parsing refreservation: %s", err)
@@ -195,8 +204,8 @@ func dataSourceTrueNASZVOLRead(ctx context.Context, d *schema.ResourceData, m in
 		}
 	}
 
-	if resp.PBKDF2Iters != nil {
-		iters, err := strconv.Atoi(*resp.PBKDF2Iters.Value)
+	if resp.Pbkdf2iters != nil {
+		iters, err := strconv.Atoi(*resp.Pbkdf2iters.Value)
 
 		if err != nil {
 			return diag.Errorf("error parsing PBKDF2Iters: %s", err)
@@ -209,8 +218,8 @@ func dataSourceTrueNASZVOLRead(ctx context.Context, d *schema.ResourceData, m in
 		}
 	}
 
-	if resp.VolSize != nil {
-		sz, err := strconv.Atoi(resp.VolSize.RawValue)
+	if resp.Volsize != nil {
+		sz, err := strconv.Atoi(resp.Volsize.Rawvalue)
 
 		if err != nil {
 			return diag.Errorf("error parsing volsize rawvalue: %s", err)
@@ -225,7 +234,7 @@ func dataSourceTrueNASZVOLRead(ctx context.Context, d *schema.ResourceData, m in
 		return diag.Errorf("error setting encrypted: %s", err)
 	}
 
-	d.SetId(resp.ID)
+	d.SetId(resp.Id)
 
 	return diags
 }

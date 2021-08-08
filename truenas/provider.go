@@ -2,7 +2,7 @@ package truenas
 
 import (
 	"context"
-	"github.com/dariusbakunas/terraform-provider-truenas/api"
+	api "github.com/dariusbakunas/truenas-go-sdk"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"golang.org/x/oauth2"
@@ -25,6 +25,12 @@ func Provider() *schema.Provider {
 				Description: "TrueNAS API base URL, eg. https://your.nas/api/v2.0",
 				DefaultFunc: schema.EnvDefaultFunc("TRUENAS_BASE_URL", nil),
 			},
+			"debug": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "DEBUG: dump all API requests/responses",
+				DefaultFunc: schema.EnvDefaultFunc("TRUENAS_DEBUG", false),
+			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"truenas_cronjob": resourceTrueNASCronjob(),
@@ -44,6 +50,7 @@ func Provider() *schema.Provider {
 func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
 	apiKey := d.Get("api_key").(string)
 	baseURL := d.Get("base_url").(string)
+	debug := d.Get("debug").(bool)
 
 	// Warning or errors can be collected in a slice type
 	var diags diag.Diagnostics
@@ -52,25 +59,16 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		&oauth2.Token{AccessToken: apiKey},
 	)
 	tc := oauth2.NewClient(ctx, ts)
-	c, err := api.NewClient(baseURL, tc)
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Unable to create TrueNAS API client",
-			Detail:   err.Error(),
-		})
-		return nil, diags
+
+	config := api.NewConfiguration()
+	config.Servers = api.ServerConfigurations{
+		{
+			URL: baseURL,
+		},
 	}
+	config.Debug = debug
+	config.HTTPClient = tc
 
+	c := api.NewAPIClient(config)
 	return c, diags
-}
-
-func getIntPtr(n int) *int {
-	num := n
-	return &num
-}
-
-func getBoolPtr(b bool) *bool {
-	val := b
-	return &val
 }

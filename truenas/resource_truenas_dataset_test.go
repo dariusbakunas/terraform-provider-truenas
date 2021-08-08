@@ -3,7 +3,7 @@ package truenas
 import (
 	"context"
 	"fmt"
-	"github.com/dariusbakunas/terraform-provider-truenas/api"
+	api "github.com/dariusbakunas/truenas-go-sdk"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
@@ -12,7 +12,7 @@ import (
 )
 
 func TestAccResourceTruenasDataset_basic(t *testing.T) {
-	var dataset api.DatasetResponse
+	var dataset api.Dataset
 	pool := "Tank"
 	suffix := acctest.RandStringFromCharSet(5, acctest.CharSetAlphaNum)
 	name := fmt.Sprintf("%s-%s", testResourcePrefix, suffix)
@@ -51,7 +51,7 @@ func TestAccResourceTruenasDataset_basic(t *testing.T) {
 }
 
 func testAccCheckResourceTruenasDatasetDestroy(s *terraform.State) error {
-	client := testAccProvider.Meta().(*api.Client)
+	client := testAccProvider.Meta().(*api.APIClient)
 
 	// loop through the resources in state, verifying each widget
 	// is destroyed
@@ -61,7 +61,7 @@ func testAccCheckResourceTruenasDatasetDestroy(s *terraform.State) error {
 		}
 
 		// Try to find the dataset
-		_, err := client.DatasetAPI.Get(context.Background(), rs.Primary.ID)
+		_, _, err := client.DatasetApi.GetDataset(context.Background(), rs.Primary.ID).Execute()
 
 		if err == nil {
 			return fmt.Errorf("dataset (%s) still exists", rs.Primary.ID)
@@ -133,7 +133,7 @@ func testAccCheckResourceTruenasDatasetConfig(pool string, name string) string {
 	`, name, pool)
 }
 
-func testAccCheckTruenasDatasetResourceExists(n string, dataset *api.DatasetResponse) resource.TestCheckFunc {
+func testAccCheckTruenasDatasetResourceExists(n string, dataset *api.Dataset) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
@@ -144,19 +144,19 @@ func testAccCheckTruenasDatasetResourceExists(n string, dataset *api.DatasetResp
 			return fmt.Errorf("no dataset ID is set")
 		}
 
-		client := testAccProvider.Meta().(*api.Client)
+		client := testAccProvider.Meta().(*api.APIClient)
 
-		resp, err := client.DatasetAPI.Get(context.Background(), rs.Primary.ID)
+		resp, _, err := client.DatasetApi.GetDataset(context.Background(), rs.Primary.ID).Execute()
 
 		if err != nil {
 			return err
 		}
 
-		if resp.ID != rs.Primary.ID {
+		if resp.Id != rs.Primary.ID {
 			return fmt.Errorf("dataset not found")
 		}
 
-		*dataset = *resp
+		*dataset = resp
 		return nil
 	}
 }
