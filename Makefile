@@ -11,6 +11,9 @@ default: install
 build:
 	go build -o ${BINARY}
 
+build-debug:
+	go build -gcflags "all=-N -l" -o ${BINARY}
+
 release:
 	GOOS=darwin GOARCH=amd64 go build -o ./bin/${BINARY}_${VERSION}_darwin_amd64
 	GOOS=freebsd GOARCH=386 go build -o ./bin/${BINARY}_${VERSION}_freebsd_386
