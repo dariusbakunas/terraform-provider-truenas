@@ -82,6 +82,8 @@ github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGX
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/dariusbakunas/truenas-go-sdk v0.3.0 h1:GrcCzK61zjMVO5RQeRl2fZs2FjmuWeEyH9Oz0LgKslM=
 github.com/dariusbakunas/truenas-go-sdk v0.3.0/go.mod h1:MuFJnVGumvdxrqb//kR6wO7bGthc7it1HZiI1kFxTm4=
+github.com/dariusbakunas/truenas-go-sdk v0.4.0 h1:+FFD2JrEDqInHmibx4x3Uts0tOoGL2oVk8iZt+8XDwQ=
+github.com/dariusbakunas/truenas-go-sdk v0.4.0/go.mod h1:MuFJnVGumvdxrqb//kR6wO7bGthc7it1HZiI1kFxTm4=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

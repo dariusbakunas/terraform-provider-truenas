@@ -41,6 +41,7 @@ func Provider() *schema.Provider {
 			"truenas_dataset":  dataSourceTrueNASDataset(),
 			"truenas_pool_ids": dataSourceTrueNASPoolIDs(),
 			"truenas_service":  dataSourceTrueNASService(),
+			"truenas_vm":       dataSourceTrueNASVM(),
 			"truenas_zvol":     dataSourceTrueNASZVOL(),
 		},
 		ConfigureContextFunc: providerConfigure,

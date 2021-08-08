@@ -25,3 +25,4 @@ provider "truenas" {
 
 - **api_key** (String, Sensitive) TrueNAS API key
 - **base_url** (String) TrueNAS API base URL, eg. https://your.nas/api/v2.0
+- **debug** (Boolean) DEBUG: dump all API requests/responses
