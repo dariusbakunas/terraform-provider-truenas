@@ -28,10 +28,15 @@ data "truenas_vm" "vm" {
 ### Read-Only
 
 - **autostart** (Boolean) `true` if VM is set to autostart
+- **bootloader** (String) VM bootloader
+- **cores** (Number) Number of CPU cores
 - **description** (String) VM description
 - **device** (Set of Object) (see [below for nested schema](#nestedatt--device))
 - **memory** (Number) Total memory available for VM (bytes)
 - **name** (String) VM name
+- **shutdown_timeout** (Number) Shutdown timeout in seconds
+- **status** (Set of Object) (see [below for nested schema](#nestedatt--status))
+- **threads** (Number) Number of CPU threads
 - **vcpus** (Number) Number of virtual CPUs
 
 <a id="nestedatt--device"></a>
@@ -43,5 +48,15 @@ Read-Only:
 - **id** (String)
 - **order** (Number)
 - **type** (String)
+
+
+<a id="nestedatt--status"></a>
+### Nested Schema for `status`
+
+Read-Only:
+
+- **domain_state** (String)
+- **pid** (Number)
+- **state** (String)
 
 

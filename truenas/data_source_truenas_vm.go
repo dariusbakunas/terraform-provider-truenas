@@ -28,8 +28,28 @@ func dataSourceTrueNASVM() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 			},
+			"bootloader": &schema.Schema{
+				Description: "VM bootloader",
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
 			"vcpus": &schema.Schema{
 				Description: "Number of virtual CPUs",
+				Type:        schema.TypeInt,
+				Computed:    true,
+			},
+			"cores": &schema.Schema{
+				Description: "Number of CPU cores",
+				Type:        schema.TypeInt,
+				Computed:    true,
+			},
+			"threads": &schema.Schema{
+				Description: "Number of CPU threads",
+				Type:        schema.TypeInt,
+				Computed:    true,
+			},
+			"shutdown_timeout": &schema.Schema{
+				Description: "Shutdown timeout in seconds",
 				Type:        schema.TypeInt,
 				Computed:    true,
 			},
@@ -73,6 +93,26 @@ func dataSourceTrueNASVM() *schema.Resource {
 					},
 				},
 			},
+			"status": &schema.Schema{
+				Type:     schema.TypeSet,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"state": &schema.Schema{
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"pid": &schema.Schema{
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"domain_state": &schema.Schema{
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -95,12 +135,24 @@ func dataSourceTrueNASVMRead(ctx context.Context, d *schema.ResourceData, m inte
 
 	d.Set("name", resp.Name)
 
+	if resp.Bootloader != nil {
+		d.Set("bootloader", *resp.Bootloader)
+	}
+
 	if resp.Description != nil {
 		d.Set("description", *resp.Description)
 	}
 
 	if resp.Vcpus != nil {
 		d.Set("vcpus", *resp.Vcpus)
+	}
+
+	if resp.Cores != nil {
+		d.Set("cores", *resp.Cores)
+	}
+
+	if resp.Threads != nil {
+		d.Set("threads", *resp.Threads)
 	}
 
 	if resp.Memory != nil {
@@ -111,9 +163,19 @@ func dataSourceTrueNASVMRead(ctx context.Context, d *schema.ResourceData, m inte
 		d.Set("autostart", *resp.Autostart)
 	}
 
+	if resp.ShutdownTimeout != nil {
+		d.Set("shutdown_timeout", *resp.ShutdownTimeout)
+	}
+
 	if resp.Devices != nil {
 		if err := d.Set("device", flattenVMDevices(*resp.Devices)); err != nil {
 			return diag.Errorf("error setting VM devices: %s", err)
+		}
+	}
+
+	if resp.Status != nil {
+		if err := d.Set("status", flattenVMStatus(*resp.Status)); err != nil {
+			return diag.Errorf("error setting VM status: %s", err)
 		}
 	}
 
@@ -153,6 +215,28 @@ func flattenVMDeviceAttributes(a map[string]interface{}) map[string]string {
 			res[k] = fmt.Sprintf("%v", v)
 		}
 	}
+
+	return res
+}
+
+func flattenVMStatus(s api.VMStatus) []interface{} {
+	var res []interface{}
+
+	status := map[string]interface{}{}
+
+	if s.State != nil {
+		status["state"] = *s.State
+	}
+
+	if s.Pid != nil {
+		status["pid"] = *s.Pid
+	}
+
+	if s.DomainState != nil {
+		status["domain_state"] = *s.DomainState
+	}
+
+	res = append(res, status)
 
 	return res
 }
