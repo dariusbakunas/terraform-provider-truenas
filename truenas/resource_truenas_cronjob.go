@@ -193,6 +193,7 @@ func resourceTrueNASCronjobDelete(ctx context.Context, d *schema.ResourceData, m
 	if err != nil {
 		return diag.Errorf("error deleting cronjob: %s", err)
 	}
+	d.SetId("")
 
 	return diags
 }

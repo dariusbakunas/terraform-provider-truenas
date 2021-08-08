@@ -494,6 +494,7 @@ func resourceTrueNASDatasetDelete(ctx context.Context, d *schema.ResourceData, m
 	}
 
 	log.Printf("[INFO] TrueNAS dataset (%s) deleted", id)
+	d.SetId("")
 
 	return diags
 }
