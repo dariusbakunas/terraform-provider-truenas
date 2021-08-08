@@ -16,6 +16,14 @@ func flattenInt32List(list []int32) []interface{} {
 	return result
 }
 
+func flattenStringList(list []string) []interface{} {
+	result := make([]interface{}, 0, len(list))
+	for _, s := range list {
+		result = append(result, s)
+	}
+	return result
+}
+
 func getStringPtr(s string) *string {
 	val := s
 	return &val

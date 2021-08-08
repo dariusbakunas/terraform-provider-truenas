@@ -5,7 +5,7 @@ go 1.15
 //replace github.com/dariusbakunas/truenas-go-sdk => /Users/darius/Programming/truenas-go-sdk
 
 require (
-	github.com/dariusbakunas/truenas-go-sdk v0.4.0
+	github.com/dariusbakunas/truenas-go-sdk v0.5.0
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/hashicorp/terraform-plugin-docs v0.4.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.5.0

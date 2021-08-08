@@ -1,0 +1,1 @@
+data "truenas_network_configuration" "nc" {}
