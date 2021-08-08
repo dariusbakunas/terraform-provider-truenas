@@ -56,6 +56,10 @@ func dataSourceTrueNASZVOL() *schema.Resource {
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
+			"key_loaded": &schema.Schema{
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
 			"name": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
@@ -101,7 +105,7 @@ func dataSourceTrueNASZVOLRead(ctx context.Context, d *schema.ResourceData, m in
 	resp, _, err := c.DatasetApi.GetDataset(ctx, id).Execute()
 
 	if err != nil {
-		return diag.Errorf("error getting dataset: %s", err)
+		return diag.Errorf("error getting zvol: %s", err)
 	}
 
 	if resp.Type != "VOLUME" {
@@ -111,11 +115,7 @@ func dataSourceTrueNASZVOLRead(ctx context.Context, d *schema.ResourceData, m in
 	dpath := newDatasetPath(id)
 
 	d.Set("pool", dpath.Pool)
-
-	if dpath.Parent != "" {
-		d.Set("parent", dpath.Parent)
-	}
-
+	d.Set("parent", dpath.Parent)
 	d.Set("name", dpath.Name)
 
 	if resp.EncryptionRoot != nil {
@@ -132,27 +132,19 @@ func dataSourceTrueNASZVOLRead(ctx context.Context, d *schema.ResourceData, m in
 
 	if resp.Comments != nil {
 		// TrueNAS does not seem to change comments case in any way
-		if err := d.Set("comments", resp.Comments.Value); err != nil {
-			return diag.Errorf("error setting comments: %s", err)
-		}
+		d.Set("comments", resp.Comments.Value)
 	}
 
 	if resp.Compression != nil {
-		if err := d.Set("compression", strings.ToLower(*resp.Compression.Value)); err != nil {
-			return diag.Errorf("error setting compression: %s", err)
-		}
+		d.Set("compression", strings.ToLower(*resp.Compression.Value))
 	}
 
 	if resp.Deduplication != nil {
-		if err := d.Set("deduplication", strings.ToLower(*resp.Deduplication.Value)); err != nil {
-			return diag.Errorf("error setting deduplication: %s", err)
-		}
+		d.Set("deduplication", strings.ToLower(*resp.Deduplication.Value))
 	}
 
 	if resp.KeyFormat != nil && resp.KeyFormat.Value != nil {
-		if err := d.Set("key_format", strings.ToLower(*resp.KeyFormat.Value)); err != nil {
-			return diag.Errorf("error setting key_format: %s", err)
-		}
+		d.Set("key_format", strings.ToLower(*resp.KeyFormat.Value))
 	}
 
 	if resp.Copies != nil {
@@ -162,9 +154,7 @@ func dataSourceTrueNASZVOLRead(ctx context.Context, d *schema.ResourceData, m in
 			return diag.Errorf("error parsing copies: %s", err)
 		}
 
-		if err := d.Set("copies", copies); err != nil {
-			return diag.Errorf("error setting copies: %s", err)
-		}
+		d.Set("copies", copies)
 	}
 
 	if resp.Reservation != nil {
@@ -174,9 +164,7 @@ func dataSourceTrueNASZVOLRead(ctx context.Context, d *schema.ResourceData, m in
 			return diag.Errorf("error parsing reservation: %s", err)
 		}
 
-		if err := d.Set("reservation", resrv); err != nil {
-			return diag.Errorf("error setting reservation: %s", err)
-		}
+		d.Set("reservation", resrv)
 	}
 
 	if resp.Refreservation != nil {
@@ -186,22 +174,15 @@ func dataSourceTrueNASZVOLRead(ctx context.Context, d *schema.ResourceData, m in
 			return diag.Errorf("error parsing refreservation: %s", err)
 		}
 
-		if err := d.Set("ref_reservation", resrv); err != nil {
-			return diag.Errorf("error setting ref_reservation: %s", err)
-		}
-
+		d.Set("ref_reservation", resrv)
 	}
 
 	if resp.Readonly != nil {
-		if err := d.Set("readonly", strings.ToLower(*resp.Readonly.Value)); err != nil {
-			return diag.Errorf("error setting readonly: %s", err)
-		}
+		d.Set("readonly", strings.ToLower(*resp.Readonly.Value))
 	}
 
 	if resp.EncryptionAlgorithm != nil && resp.EncryptionAlgorithm.Value != nil {
-		if err := d.Set("encryption_algorithm", *resp.EncryptionAlgorithm.Value); err != nil {
-			return diag.Errorf("error setting encryption_algorithm: %s", err)
-		}
+		d.Set("encryption_algorithm", *resp.EncryptionAlgorithm.Value)
 	}
 
 	if resp.Pbkdf2iters != nil {
@@ -211,11 +192,7 @@ func dataSourceTrueNASZVOLRead(ctx context.Context, d *schema.ResourceData, m in
 			return diag.Errorf("error parsing PBKDF2Iters: %s", err)
 		}
 
-		if iters >= 0 {
-			if err := d.Set("pbkdf2iters", iters); err != nil {
-				return diag.Errorf("error setting PBKDF2Iters: %s", err)
-			}
-		}
+		d.Set("pbkdf2iters", iters)
 	}
 
 	if resp.Volsize != nil {
@@ -230,8 +207,8 @@ func dataSourceTrueNASZVOLRead(ctx context.Context, d *schema.ResourceData, m in
 		}
 	}
 
-	if err := d.Set("encrypted", resp.Encrypted); err != nil {
-		return diag.Errorf("error setting encrypted: %s", err)
+	if resp.Encrypted != nil {
+		d.Set("encrypted", *resp.Encrypted)
 	}
 
 	d.SetId(resp.Id)

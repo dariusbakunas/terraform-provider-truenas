@@ -249,10 +249,10 @@ func resourceTrueNASDataset() *schema.Resource {
 			},
 			"sync": &schema.Schema{
 				Type:         schema.TypeString,
-				Description:  "'standard' uses the sync settings that have been requested by the client software, 'always' waits for data writes to complete, and 'disabled' never waits for writes to complete.",
+				Description: "Sets the data write synchronization. `inherit` takes the sync settings from the parent dataset, `standard` uses the settings that have been requested by the client software, `always` waits for data writes to complete, and `disabled` never waits for writes to complete.",
 				Optional:     true,
 				Computed:     true,
-				ValidateFunc: validation.StringInSlice([]string{"standard", "always", "disabled"}, false),
+				ValidateFunc: validation.StringInSlice([]string{"always", "standard", "disabled", "inherit"}, false),
 			},
 			"snap_dir": &schema.Schema{
 				Type:         schema.TypeString,
@@ -265,11 +265,9 @@ func resourceTrueNASDataset() *schema.Resource {
 }
 
 func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	var diags diag.Diagnostics
-
 	c := m.(*api.APIClient)
 
-	input := flattenDataset(d)
+	input := expandDataset(d)
 
 	log.Printf("[DEBUG] Creating TrueNAS dataset: %+v", input)
 
@@ -283,7 +281,7 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 
 	log.Printf("[INFO] TrueNAS dataset (%s) created", resp.Id)
 
-	return append(diags, resourceTrueNASDatasetRead(ctx, d, m)...)
+	return resourceTrueNASDatasetRead(ctx, d, m)
 }
 
 func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -301,81 +299,50 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 
 	dpath := newDatasetPath(resp.Id)
 
-	if err := d.Set("id", resp.Id); err != nil {
-		return diag.Errorf("error setting id: %s", err)
-	}
-
-	if err := d.Set("pool", dpath.Pool); err != nil {
-		return diag.Errorf("error setting pool: %s", err)
-	}
-
-	if err := d.Set("parent", dpath.Parent); err != nil {
-		return diag.Errorf("error setting parent: %s", err)
-	}
-
-	if err := d.Set("name", dpath.Name); err != nil {
-		return diag.Errorf("error setting name: %s", err)
-	}
+	d.Set("id", resp.Id)
+	d.Set("pool", dpath.Pool)
+	d.Set("parent", dpath.Parent)
+	d.Set("name", dpath.Name)
 
 	if resp.Mountpoint != nil {
-		if err := d.Set("mount_point", *resp.Mountpoint); err != nil {
-			return diag.Errorf("error setting mount_point: %s", err)
-		}
+		d.Set("mount_point", *resp.Mountpoint)
 	}
 
 	if resp.Aclmode != nil && resp.Aclmode.Value != nil {
-		if err := d.Set("acl_mode", strings.ToLower(*resp.Aclmode.Value)); err != nil {
-			return diag.Errorf("error setting acl_mode: %s", err)
-		}
+		d.Set("acl_mode", strings.ToLower(*resp.Aclmode.Value))
 	}
 
 	if resp.Acltype != nil && resp.Acltype.Value != nil {
-		if err := d.Set("acl_type", strings.ToLower(*resp.Acltype.Value)); err != nil {
-			return diag.Errorf("error setting acl_type: %s", err)
-		}
+		d.Set("acl_type", strings.ToLower(*resp.Acltype.Value))
 	}
 
 	if resp.Atime != nil && resp.Atime.Value != nil {
-		if err := d.Set("atime", strings.ToLower(*resp.Atime.Value)); err != nil {
-			return diag.Errorf("error setting atime: %s", err)
-		}
+		d.Set("atime", strings.ToLower(*resp.Atime.Value))
 	}
 
 	if resp.Casesensitivity != nil && resp.Casesensitivity.Value != nil {
-		if err := d.Set("case_sensitivity", strings.ToLower(*resp.Casesensitivity.Value)); err != nil {
-			return diag.Errorf("error setting case_sensitivity: %s", err)
-		}
+		d.Set("case_sensitivity", strings.ToLower(*resp.Casesensitivity.Value))
 	}
 
 	if resp.Comments != nil && resp.Comments.Value != nil {
 		// TrueNAS does not seem to change comments case in any way
-		if err := d.Set("comments", resp.Comments.Value); err != nil {
-			return diag.Errorf("error setting comments: %s", err)
-		}
+		d.Set("comments", resp.Comments.Value)
 	}
 
 	if resp.Compression != nil && resp.Compression.Value != nil {
-		if err := d.Set("compression", strings.ToLower(*resp.Compression.Value)); err != nil {
-			return diag.Errorf("error setting compression: %s", err)
-		}
+		d.Set("compression", strings.ToLower(*resp.Compression.Value))
 	}
 
 	if resp.Deduplication != nil && resp.Deduplication.Value != nil {
-		if err := d.Set("deduplication", strings.ToLower(*resp.Deduplication.Value)); err != nil {
-			return diag.Errorf("error setting deduplication: %s", err)
-		}
+		d.Set("deduplication", strings.ToLower(*resp.Deduplication.Value))
 	}
 
 	if resp.Exec != nil && resp.Exec.Value != nil {
-		if err := d.Set("exec", strings.ToLower(*resp.Exec.Value)); err != nil {
-			return diag.Errorf("error setting exec: %s", err)
-		}
+		d.Set("exec", strings.ToLower(*resp.Exec.Value))
 	}
 
 	if resp.Managedby != nil && resp.Managedby.Value != nil {
-		if err := d.Set("managed_by", *resp.Managedby.Value); err != nil {
-			return diag.Errorf("error setting managed_by: %s", err)
-		}
+		d.Set("managed_by", *resp.Managedby.Value)
 	}
 
 	if resp.Copies != nil && resp.Copies.Value != nil {
@@ -385,9 +352,7 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 			return diag.Errorf("error parsing copies: %s", err)
 		}
 
-		if err := d.Set("copies", copies); err != nil {
-			return diag.Errorf("error setting copies: %s", err)
-		}
+		d.Set("copies", copies)
 	}
 
 	if resp.Quota != nil {
@@ -397,9 +362,7 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 			return diag.Errorf("error parsing quota: %s", err)
 		}
 
-		if err := d.Set("quota_bytes", quota); err != nil {
-			return diag.Errorf("error setting quota_bytes: %s", err)
-		}
+		d.Set("quota_bytes", quota)
 	}
 
 	if resp.QuotaCritical != nil && resp.QuotaCritical.Value != nil {
@@ -409,9 +372,7 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 			return diag.Errorf("error parsing quota_critical: %s", err)
 		}
 
-		if err := d.Set("quota_critical", quota); err != nil {
-			return diag.Errorf("error setting quota_critical: %s", err)
-		}
+		d.Set("quota_critical", quota)
 	}
 
 	if resp.QuotaWarning != nil && resp.QuotaWarning.Value != nil {
@@ -421,9 +382,7 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 			return diag.Errorf("error parsing quota_warning: %s", err)
 		}
 
-		if err := d.Set("quota_warning", quota); err != nil {
-			return diag.Errorf("error setting quota_warning: %s", err)
-		}
+		d.Set("quota_warning", quota)
 	}
 
 	if resp.Refquota != nil {
@@ -433,9 +392,7 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 			return diag.Errorf("error parsing refquota: %s", err)
 		}
 
-		if err := d.Set("ref_quota_bytes", quota); err != nil {
-			return diag.Errorf("error setting ref_quota_bytes: %s", err)
-		}
+		d.Set("ref_quota_bytes", quota)
 	}
 
 	if resp.RefquotaCritical != nil && resp.RefquotaCritical.Value != nil {
@@ -445,9 +402,7 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 			return diag.Errorf("error parsing refquota_critical: %s", err)
 		}
 
-		if err := d.Set("ref_quota_critical", quota); err != nil {
-			return diag.Errorf("error setting ref_quota_critical: %s", err)
-		}
+		d.Set("ref_quota_critical", quota)
 	}
 
 	if resp.RefquotaWarning != nil && resp.RefquotaWarning.Value != nil {
@@ -457,21 +412,15 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 			return diag.Errorf("error parsing refquota_warning: %s", err)
 		}
 
-		if err := d.Set("ref_quota_warning", quota); err != nil {
-			return diag.Errorf("error setting ref_quota_warning: %s", err)
-		}
+		d.Set("ref_quota_warning", quota)
 	}
 
 	if resp.Readonly != nil && resp.Readonly.Value != nil {
-		if err := d.Set("readonly", strings.ToLower(*resp.Readonly.Value)); err != nil {
-			return diag.Errorf("error setting readonly: %s", err)
-		}
+		d.Set("readonly", strings.ToLower(*resp.Readonly.Value))
 	}
 
 	if resp.Recordsize != nil && resp.Recordsize.Value != nil {
-		if err := d.Set("record_size", *resp.Recordsize.Value); err != nil {
-			return diag.Errorf("error setting record_size: %s", err)
-		}
+		d.Set("record_size", *resp.Recordsize.Value)
 	}
 
 	// TODO: doublecheck, does not seem to be ever returned
@@ -482,21 +431,15 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 	//}
 
 	if resp.Sync != nil {
-		if err := d.Set("sync", strings.ToLower(*resp.Sync.Value)); err != nil {
-			return diag.Errorf("error setting sync: %s", err)
-		}
+		d.Set("sync", strings.ToLower(*resp.Sync.Value))
 	}
 
 	if resp.Snapdir != nil && resp.Snapdir.Value != nil {
-		if err := d.Set("snap_dir", strings.ToLower(*resp.Snapdir.Value)); err != nil {
-			return diag.Errorf("error setting snap_dir: %s", err)
-		}
+		d.Set("snap_dir", strings.ToLower(*resp.Snapdir.Value))
 	}
 
 	if resp.EncryptionAlgorithm != nil && resp.EncryptionAlgorithm.Value != nil {
-		if err := d.Set("encryption_algorithm", *resp.EncryptionAlgorithm.Value); err != nil {
-			return diag.Errorf("error setting encryption_algorithm: %s", err)
-		}
+		d.Set("encryption_algorithm", *resp.EncryptionAlgorithm.Value)
 	}
 
 	if resp.Pbkdf2iters != nil && resp.Pbkdf2iters.Value != nil {
@@ -506,15 +449,11 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 			return diag.Errorf("error parsing PBKDF2Iters: %s", err)
 		}
 
-		if iters > 0 {
-			if err := d.Set("pbkdf2iters", iters); err != nil {
-				return diag.Errorf("error setting PBKDF2Iters: %s", err)
-			}
-		}
+		d.Set("pbkdf2iters", iters)
 	}
 
-	if err := d.Set("encrypted", resp.Encrypted); err != nil {
-		return diag.Errorf("error setting encrypted: %s", err)
+	if resp.Encrypted != nil {
+		d.Set("encrypted", *resp.Encrypted)
 	}
 
 	return diags
@@ -525,7 +464,7 @@ func resourceTrueNASDatasetUpdate(ctx context.Context, d *schema.ResourceData, m
 
 	c := m.(*api.APIClient)
 
-	input := flattenDatasetForUpdate(d)
+	input := expandDatasetForUpdate(d)
 
 	log.Printf("[DEBUG] Updating TrueNAS dataset: %+v", input)
 
@@ -559,7 +498,7 @@ func resourceTrueNASDatasetDelete(ctx context.Context, d *schema.ResourceData, m
 	return diags
 }
 
-func flattenDataset(d *schema.ResourceData) api.CreateDatasetParams {
+func expandDataset(d *schema.ResourceData) api.CreateDatasetParams {
 	p := datasetPath{
 		Pool:   d.Get("pool").(string),
 		Parent: d.Get("parent").(string),
@@ -682,7 +621,7 @@ func flattenDataset(d *schema.ResourceData) api.CreateDatasetParams {
 	return input
 }
 
-func flattenDatasetForUpdate(d *schema.ResourceData) api.UpdateDatasetParams {
+func expandDatasetForUpdate(d *schema.ResourceData) api.UpdateDatasetParams {
 	input := api.UpdateDatasetParams{}
 
 	if sync, ok := d.GetOk("sync"); ok {
