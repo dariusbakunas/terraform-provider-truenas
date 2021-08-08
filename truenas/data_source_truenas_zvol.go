@@ -88,7 +88,7 @@ func dataSourceTrueNASZVOL() *schema.Resource {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"vol_size_bytes": &schema.Schema{
+			"volsize": &schema.Schema{
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
@@ -202,9 +202,7 @@ func dataSourceTrueNASZVOLRead(ctx context.Context, d *schema.ResourceData, m in
 			return diag.Errorf("error parsing volsize rawvalue: %s", err)
 		}
 
-		if err := d.Set("vol_size_bytes", sz); err != nil {
-			return diag.Errorf("error setting vol_size_bytes: %s", err)
-		}
+		d.Set("volsize", sz)
 	}
 
 	if resp.Encrypted != nil {
