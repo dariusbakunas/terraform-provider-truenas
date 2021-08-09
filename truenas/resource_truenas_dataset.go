@@ -249,7 +249,7 @@ func resourceTrueNASDataset() *schema.Resource {
 			},
 			"sync": &schema.Schema{
 				Type:         schema.TypeString,
-				Description: "Sets the data write synchronization. `inherit` takes the sync settings from the parent dataset, `standard` uses the settings that have been requested by the client software, `always` waits for data writes to complete, and `disabled` never waits for writes to complete.",
+				Description:  "Sets the data write synchronization. `inherit` takes the sync settings from the parent dataset, `standard` uses the settings that have been requested by the client software, `always` waits for data writes to complete, and `disabled` never waits for writes to complete.",
 				Optional:     true,
 				Computed:     true,
 				ValidateFunc: validation.StringInSlice([]string{"always", "standard", "disabled", "inherit"}, false),
@@ -460,8 +460,6 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 }
 
 func resourceTrueNASDatasetUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	var diags diag.Diagnostics
-
 	c := m.(*api.APIClient)
 
 	input := expandDatasetForUpdate(d)
@@ -476,7 +474,7 @@ func resourceTrueNASDatasetUpdate(ctx context.Context, d *schema.ResourceData, m
 
 	log.Printf("[INFO] TrueNAS dataset (%s) updated", d.Id())
 
-	return append(diags, resourceTrueNASDatasetRead(ctx, d, m)...)
+	return resourceTrueNASDatasetRead(ctx, d, m)
 }
 
 func resourceTrueNASDatasetDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
