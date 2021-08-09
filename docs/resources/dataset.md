@@ -80,7 +80,7 @@ resource "truenas_dataset" "test" {
 - **ref_quota_warning** (Number)
 - **share_type** (String)
 - **snap_dir** (String)
-- **sync** (String) 'standard' uses the sync settings that have been requested by the client software, 'always' waits for data writes to complete, and 'disabled' never waits for writes to complete.
+- **sync** (String) Sets the data write synchronization. `inherit` takes the sync settings from the parent dataset, `standard` uses the settings that have been requested by the client software, `always` waits for data writes to complete, and `disabled` never waits for writes to complete.
 - **timeouts** (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 
 ### Read-Only

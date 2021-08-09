@@ -35,6 +35,7 @@ data "truenas_zvol" "vol" {
 - **encryption_algorithm** (String)
 - **encryption_root** (String)
 - **key_format** (String)
+- **key_loaded** (Boolean)
 - **locked** (Boolean)
 - **name** (String)
 - **parent** (String)
@@ -43,6 +44,6 @@ data "truenas_zvol" "vol" {
 - **readonly** (String)
 - **ref_reservation** (Number)
 - **reservation** (Number)
-- **vol_size_bytes** (Number)
+- **volsize** (Number)
 
 
