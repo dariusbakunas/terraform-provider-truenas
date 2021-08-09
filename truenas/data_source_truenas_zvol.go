@@ -17,6 +17,11 @@ func dataSourceTrueNASZVOL() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
+			"blocksize": &schema.Schema{
+				Description: "Volume blocksize",
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
 			"comments": &schema.Schema{
 				Description: "Any notes about this volume.",
 				Type:        schema.TypeString,
@@ -117,6 +122,10 @@ func dataSourceTrueNASZVOLRead(ctx context.Context, d *schema.ResourceData, m in
 	d.Set("pool", dpath.Pool)
 	d.Set("parent", dpath.Parent)
 	d.Set("name", dpath.Name)
+
+	if resp.Volblocksize != nil {
+		d.Set("blocksize", *resp.Volblocksize.Value)
+	}
 
 	if resp.EncryptionRoot != nil {
 		d.Set("encryption_root", resp.EncryptionRoot)

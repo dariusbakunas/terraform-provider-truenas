@@ -166,6 +166,10 @@ func resourceTrueNASZVOLRead(ctx context.Context, d *schema.ResourceData, m inte
 	d.Set("parent", dpath.Parent)
 	d.Set("name", dpath.Name)
 
+	if resp.Volblocksize != nil {
+		d.Set("blocksize", *resp.Volblocksize.Value)
+	}
+
 	if resp.EncryptionRoot != nil {
 		d.Set("encryption_root", resp.EncryptionRoot)
 	}
