@@ -27,20 +27,20 @@ resource "truenas_zvol" "zv" {
 
 ### Required
 
-- **compression** (String) Current zvol compression level
+- **compression** (String) Compression level
 - **name** (String) Unique identifier for the volume. Cannot be changed after the zvol is created.
 - **pool** (String)
 - **volsize** (Number) Volume size in bytes, should be multiples of block size
 
 ### Optional
 
-- **blocksize** (String) Volume size in bytes
+- **blocksize** (String) Volume blocksize
 - **comments** (String) Any notes about this volume.
-- **deduplication** (String)
+- **deduplication** (String) Transparently reuse a single copy of duplicated data to save space. Deduplication can improve storage capacity, but is RAM intensive. Compressing data is generally recommended before using deduplication. Deduplicating data is a one-way process. *Deduplicated data cannot be undeduplicated!*.
 - **encryption_algorithm** (String)
 - **force_size** (Boolean) The system restricts creating a zvol that brings the pool to over 80% capacity. Set to force creation of the zvol (not recommended)
 - **inherit_encryption** (Boolean) Use the encryption properties of the root dataset.
-- **parent** (String)
+- **parent** (String) Parent dataset
 - **read_only** (String) Set to prevent the zvol from being modified
 - **sync** (String) Sets the data write synchronization. `inherit` takes the sync settings from the parent dataset, `standard` uses the settings that have been requested by the client software, `always` waits for data writes to complete, and `disabled` never waits for writes to complete.
 

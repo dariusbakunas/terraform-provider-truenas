@@ -27,6 +27,7 @@ data "truenas_zvol" "vol" {
 
 ### Read-Only
 
+- **blocksize** (String) Volume blocksize
 - **comments** (String) Any notes about this volume.
 - **compression** (String) Current zvol compression level
 - **copies** (Number)

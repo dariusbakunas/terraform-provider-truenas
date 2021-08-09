@@ -24,7 +24,7 @@ func resourceTrueNASZVOL() *schema.Resource {
 				Computed: true,
 			},
 			"blocksize": &schema.Schema{
-				Description:  "Volume size in bytes",
+				Description:  "Volume blocksize",
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,
@@ -37,7 +37,7 @@ func resourceTrueNASZVOL() *schema.Resource {
 				Optional:    true,
 			},
 			"compression": &schema.Schema{
-				Description:  "Current zvol compression level",
+				Description:  "Compression level",
 				Type:         schema.TypeString,
 				Required:     true,
 				ValidateFunc: validation.StringInSlice(supportedCompression, false),
@@ -47,6 +47,7 @@ func resourceTrueNASZVOL() *schema.Resource {
 				Computed: true,
 			},
 			"deduplication": &schema.Schema{
+				Description: "Transparently reuse a single copy of duplicated data to save space. Deduplication can improve storage capacity, but is RAM intensive. Compressing data is generally recommended before using deduplication. Deduplicating data is a one-way process. *Deduplicated data cannot be undeduplicated!*.",
 				Type:         schema.TypeString,
 				Optional:     true,
 				Default:      "off",
@@ -96,6 +97,7 @@ func resourceTrueNASZVOL() *schema.Resource {
 				Default:     false,
 			},
 			"parent": &schema.Schema{
+				Description: "Parent dataset",
 				Type:     schema.TypeString,
 				Optional: true,
 				Default:  "",
