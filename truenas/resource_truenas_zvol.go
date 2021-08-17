@@ -113,7 +113,7 @@ func resourceTrueNASZVOL() *schema.Resource {
 				ValidateFunc: validation.StringDoesNotContainAny("/"),
 				ForceNew:     true,
 			},
-			"read_only": &schema.Schema{
+			"readonly": &schema.Schema{
 				Type:         schema.TypeString,
 				Description:  "Set to prevent the zvol from being modified",
 				Optional:     true,
@@ -230,7 +230,7 @@ func resourceTrueNASZVOLRead(ctx context.Context, d *schema.ResourceData, m inte
 	}
 
 	if resp.Readonly != nil {
-		d.Set("read_only", strings.ToLower(*resp.Readonly.Value))
+		d.Set("readonly", strings.ToLower(*resp.Readonly.Value))
 	}
 
 	if resp.EncryptionAlgorithm != nil && resp.EncryptionAlgorithm.Value != nil {
@@ -337,8 +337,8 @@ func resourceTrueNASZVOLUpdate(ctx context.Context, d *schema.ResourceData, m in
 		input.Deduplication = getStringPtr(strings.ToUpper(d.Get("deduplication").(string)))
 	}
 
-	if d.HasChange("read_only") {
-		input.Readonly = getStringPtr(strings.ToUpper(d.Get("read_only").(string)))
+	if d.HasChange("readonly") {
+		input.Readonly = getStringPtr(strings.ToUpper(d.Get("readonly").(string)))
 	}
 
 	if d.HasChange("force_size") {
@@ -386,7 +386,7 @@ func expandZvol(d *schema.ResourceData) api.CreateDatasetParams {
 		input.InheritEncryption = getBoolPtr(inheritEncryption.(bool))
 	}
 
-	if readOnly, ok := d.GetOk("read_only"); ok {
+	if readOnly, ok := d.GetOk("readonly"); ok {
 		input.Readonly = getStringPtr(strings.ToUpper(readOnly.(string)))
 	}
 
