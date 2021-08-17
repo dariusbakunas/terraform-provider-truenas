@@ -47,6 +47,7 @@ resource "truenas_zvol" "zv" {
 ### Read-Only
 
 - **copies** (Number)
+- **encrypted** (Boolean)
 - **encryption_root** (String)
 - **id** (String) The ID of this resource.
 - **key_format** (String)
