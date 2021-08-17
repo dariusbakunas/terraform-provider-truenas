@@ -8,7 +8,6 @@ import (
 )
 
 func TestAccDataSourceTruenasDataset_basic(t *testing.T) {
-	pool := "Tank"
 	suffix := acctest.RandStringFromCharSet(5, acctest.CharSetAlphaNum)
 	name := fmt.Sprintf("%s-%s", testResourcePrefix, suffix)
 	resourceName := "data.truenas_dataset.ds"
@@ -18,10 +17,10 @@ func TestAccDataSourceTruenasDataset_basic(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckDataSourceTruenasDatasetConfig(pool, name),
+				Config: testAccCheckDataSourceTruenasDatasetConfig(testPoolName, name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "name", name),
-					resource.TestCheckResourceAttr(resourceName, "pool", pool),
+					resource.TestCheckResourceAttr(resourceName, "pool", testPoolName),
 					resource.TestCheckResourceAttr(resourceName, "comments", "Test dataset"),
 					resource.TestCheckResourceAttr(resourceName, "sync", "standard"),
 					resource.TestCheckResourceAttr(resourceName, "atime", "off"),
