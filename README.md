@@ -71,6 +71,12 @@ To run acceptance tests, make sure `TRUENAS_API_KEY` and `TRUENAS_BASE_URL` envi
 make testacc
 ```
 
+In order to run a particular Acceptance test, export the variable TESTARGS. For example
+
+```bash
+export TESTARGS="-run TestAccDataSourceTruenasCronjob_basic"
+```
+
 **Note:** Acceptance tests create/destroy real resources, while they are named using `tf-acc-test-` testing prefix, take some caution.
 
 ### Debugging
