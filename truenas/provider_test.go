@@ -19,15 +19,6 @@ func init() {
 	testAccProviders = map[string]*schema.Provider{
 		"truenas": testAccProvider,
 	}
-}
-
-func testAccPreCheck(t *testing.T) {
-	if v := os.Getenv("TRUENAS_API_KEY"); v == "" {
-		t.Fatal("TRUENAS_API_KEY must be set for acceptance tests")
-	}
-	if v := os.Getenv("TRUENAS_BASE_URL"); v == "" {
-		t.Fatal("TRUENAS_BASE_URL must be set for acceptance tests")
-	}
 
 	if v := os.Getenv("TRUENAS_POOL_NAME"); v != "" {
 		testPoolName = v
@@ -36,5 +27,14 @@ func testAccPreCheck(t *testing.T) {
 	if testPoolName == "" {
 		log.Printf("[WARN] Env TRUENAS_POOL_NAME was not specified, using default 'Tank'")
 		testPoolName = "Tank"
+	}
+}
+
+func testAccPreCheck(t *testing.T) {
+	if v := os.Getenv("TRUENAS_API_KEY"); v == "" {
+		t.Fatal("TRUENAS_API_KEY must be set for acceptance tests")
+	}
+	if v := os.Getenv("TRUENAS_BASE_URL"); v == "" {
+		t.Fatal("TRUENAS_BASE_URL must be set for acceptance tests")
 	}
 }

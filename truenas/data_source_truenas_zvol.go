@@ -93,6 +93,11 @@ func dataSourceTrueNASZVOL() *schema.Resource {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
+			"sync": &schema.Schema{
+				Type:         schema.TypeString,
+				Description:  "Sets the data write synchronization. `inherit` takes the sync settings from the parent dataset, `standard` uses the settings that have been requested by the client software, `always` waits for data writes to complete, and `disabled` never waits for writes to complete.",
+				Computed:     true,
+			},
 			"volsize": &schema.Schema{
 				Type:     schema.TypeInt,
 				Computed: true,
@@ -188,6 +193,10 @@ func dataSourceTrueNASZVOLRead(ctx context.Context, d *schema.ResourceData, m in
 
 	if resp.Readonly != nil {
 		d.Set("readonly", strings.ToLower(*resp.Readonly.Value))
+	}
+
+	if resp.Sync != nil {
+		d.Set("sync", strings.ToLower(*resp.Sync.Value))
 	}
 
 	if resp.EncryptionAlgorithm != nil && resp.EncryptionAlgorithm.Value != nil {

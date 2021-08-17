@@ -53,6 +53,10 @@ func resourceTrueNASZVOL() *schema.Resource {
 				Default:      "off",
 				ValidateFunc: validation.StringInSlice([]string{"on", "off", "verify"}, false),
 			},
+			"encrypted": &schema.Schema{
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
 			"encryption_algorithm": &schema.Schema{
 				Type:         schema.TypeString,
 				Optional:     true,
