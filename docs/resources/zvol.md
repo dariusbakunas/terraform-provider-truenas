@@ -41,7 +41,7 @@ resource "truenas_zvol" "zv" {
 - **force_size** (Boolean) The system restricts creating a zvol that brings the pool to over 80% capacity. Set to force creation of the zvol (not recommended)
 - **inherit_encryption** (Boolean) Use the encryption properties of the root dataset.
 - **parent** (String) Parent dataset
-- **read_only** (String) Set to prevent the zvol from being modified
+- **readonly** (String) Set to prevent the zvol from being modified
 - **sync** (String) Sets the data write synchronization. `inherit` takes the sync settings from the parent dataset, `standard` uses the settings that have been requested by the client software, `always` waits for data writes to complete, and `disabled` never waits for writes to complete.
 
 ### Read-Only
