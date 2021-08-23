@@ -14,7 +14,7 @@ Get information about system service
 
 ```terraform
 data "truenas_service" "svc" {
-  id = 3
+  service_id = 3
 }
 ```
 

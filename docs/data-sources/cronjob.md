@@ -14,7 +14,7 @@ Get information about specific cronjob
 
 ```terraform
 data "truenas_cronjob" "job" {
-  id = 1
+  cronjob_id = 1
 }
 ```
 

@@ -14,7 +14,7 @@ description: |-
 
 ```terraform
 data "truenas_vm" "vm" {
-  id = "3"
+  vm_id = "3"
 }
 ```
 

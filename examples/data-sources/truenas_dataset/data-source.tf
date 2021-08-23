@@ -1,3 +1,3 @@
 data "truenas_dataset" "dataset" {
-  id = "Tank/home/Example"
+  dataset_id = "Tank/home/Example"
 }

@@ -1,3 +1,3 @@
 data "truenas_zvol" "vol" {
-  id = "Tank/dev-3qsqd"
+  zvol_id = "Tank/dev-3qsqd"
 }
