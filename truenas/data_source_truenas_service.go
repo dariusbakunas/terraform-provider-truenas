@@ -14,7 +14,7 @@ func dataSourceTrueNASService() *schema.Resource {
 		Description: "Get information about system service",
 		ReadContext: dataSourceTrueNASServiceRead,
 		Schema: map[string]*schema.Schema{
-			"id": &schema.Schema{
+			"service_id": &schema.Schema{
 				Description: "Service ID",
 				Type:        schema.TypeInt,
 				Required:    true,
@@ -50,7 +50,7 @@ func dataSourceTrueNASServiceRead(ctx context.Context, d *schema.ResourceData, m
 	var diags diag.Diagnostics
 
 	c := m.(*api.APIClient)
-	id := d.Get("id").(int)
+	id := d.Get("service_id").(int)
 
 	resp, _, err := c.ServiceApi.GetService(ctx, int32(id)).Execute()
 

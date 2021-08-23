@@ -46,7 +46,7 @@ func testAccCheckDataSourceTruenasCronjobConfig() string {
 		}
 
 		data "truenas_cronjob" "cj" {
-		  id = truenas_cronjob.cj.id
+		  cronjob_id = truenas_cronjob.cj.cronjob_id
 		}
 	`)
 }

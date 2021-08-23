@@ -16,7 +16,7 @@ func resourceTrueNASCronjob() *schema.Resource {
 		UpdateContext: resourceTrueNASCronjobUpdate,
 		DeleteContext: resourceTrueNASCronjobDelete,
 		Schema: map[string]*schema.Schema{
-			"id": &schema.Schema{
+			"cronjob_id": &schema.Schema{
 				Description: "Cronjob ID",
 				Type:        schema.TypeString,
 				Computed:    true,
@@ -110,7 +110,7 @@ func resourceTrueNASCronjobRead(ctx context.Context, d *schema.ResourceData, m i
 		return diag.Errorf("error getting cronjob: %s", err)
 	}
 
-	d.Set("id", strconv.Itoa(int(*resp.Id)))
+	d.Set("cronjob_id", strconv.Itoa(int(*resp.Id)))
 	d.Set("user", *resp.User)
 	d.Set("command", *resp.Command)
 

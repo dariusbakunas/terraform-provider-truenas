@@ -13,7 +13,7 @@ func dataSourceTrueNASDataset() *schema.Resource {
 	return &schema.Resource{
 		ReadContext: dataSourceTrueNASDatasetRead,
 		Schema: map[string]*schema.Schema{
-			"id": &schema.Schema{
+			"dataset_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
@@ -460,7 +460,7 @@ func dataSourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m
 	var diags diag.Diagnostics
 
 	c := m.(*api.APIClient)
-	id := d.Get("id").(string)
+	id := d.Get("dataset_id").(string)
 
 	resp, _, err := c.DatasetApi.GetDataset(ctx, id).Execute()
 

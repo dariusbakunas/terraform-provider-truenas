@@ -13,7 +13,7 @@ func dataSourceTrueNASZVOL() *schema.Resource {
 	return &schema.Resource{
 		ReadContext: dataSourceTrueNASZVOLRead,
 		Schema: map[string]*schema.Schema{
-			"id": &schema.Schema{
+			"zvol_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
@@ -110,7 +110,7 @@ func dataSourceTrueNASZVOLRead(ctx context.Context, d *schema.ResourceData, m in
 	var diags diag.Diagnostics
 
 	c := m.(*api.APIClient)
-	id := d.Get("id").(string)
+	id := d.Get("zvol_id").(string)
 
 	resp, _, err := c.DatasetApi.GetDataset(ctx, id).Execute()
 

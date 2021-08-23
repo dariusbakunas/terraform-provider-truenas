@@ -68,7 +68,7 @@ func testAccCheckDataSourceTruenasDatasetConfig(pool string, name string) string
 		}
 
 		data "truenas_dataset" "ds" {
-			id = truenas_dataset.test.id
+			dataset_id = truenas_dataset.test.dataset_id
 		}
 	`, name, pool)
 }

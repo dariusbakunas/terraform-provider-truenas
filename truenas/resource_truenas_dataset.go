@@ -61,7 +61,7 @@ func resourceTrueNASDataset() *schema.Resource {
 			Delete: schema.DefaultTimeout(4 * time.Minute),
 		},
 		Schema: map[string]*schema.Schema{
-			"id": &schema.Schema{
+			"dataset_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -299,7 +299,7 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 
 	dpath := newDatasetPath(resp.Id)
 
-	d.Set("id", resp.Id)
+	d.Set("dataset_id", resp.Id)
 	d.Set("pool", dpath.Pool)
 	d.Set("parent", dpath.Parent)
 	d.Set("name", dpath.Name)

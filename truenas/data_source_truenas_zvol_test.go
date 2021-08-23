@@ -50,7 +50,7 @@ func testAccCheckDataSourceTruenasZvolConfig(pool string, name string) string {
 		}
 
 		data "truenas_zvol" "zv" {
-			id = truenas_zvol.test.id
+			zvol_id = truenas_zvol.test.zvol_id
 		}
 	`, name, pool)
 }

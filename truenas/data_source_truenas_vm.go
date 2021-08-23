@@ -13,7 +13,7 @@ func dataSourceTrueNASVM() *schema.Resource {
 	return &schema.Resource{
 		ReadContext: dataSourceTrueNASVMRead,
 		Schema: map[string]*schema.Schema{
-			"id": &schema.Schema{
+			"vm_id": &schema.Schema{
 				Description: "VM ID",
 				Type:        schema.TypeString,
 				Required:    true,
@@ -121,7 +121,7 @@ func dataSourceTrueNASVMRead(ctx context.Context, d *schema.ResourceData, m inte
 	var diags diag.Diagnostics
 
 	c := m.(*api.APIClient)
-	id, err := strconv.Atoi(d.Get("id").(string))
+	id, err := strconv.Atoi(d.Get("vm_id").(string))
 
 	if err != nil {
 		return diag.FromErr(err)

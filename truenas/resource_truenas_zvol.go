@@ -19,7 +19,7 @@ func resourceTrueNASZVOL() *schema.Resource {
 		UpdateContext: resourceTrueNASZVOLUpdate,
 		DeleteContext: resourceTrueNASZVOLDelete,
 		Schema: map[string]*schema.Schema{
-			"id": &schema.Schema{
+			"zvol_id": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -152,7 +152,7 @@ func resourceTrueNASZVOLRead(ctx context.Context, d *schema.ResourceData, m inte
 	var diags diag.Diagnostics
 
 	c := m.(*api.APIClient)
-	id := d.Get("id").(string)
+	id := d.Id()
 
 	resp, _, err := c.DatasetApi.GetDataset(ctx, id).Execute()
 
@@ -268,6 +268,8 @@ func resourceTrueNASZVOLRead(ctx context.Context, d *schema.ResourceData, m inte
 	if resp.Encrypted != nil {
 		d.Set("encrypted", *resp.Encrypted)
 	}
+
+	d.Set("zvol_id", id)
 
 	return diags
 }

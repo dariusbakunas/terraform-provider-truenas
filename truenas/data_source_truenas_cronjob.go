@@ -13,7 +13,7 @@ func dataSourceTrueNASCronjob() *schema.Resource {
 		Description: "Get information about specific cronjob",
 		ReadContext: dataSourceTrueNASCronjobRead,
 		Schema: map[string]*schema.Schema{
-			"id": &schema.Schema{
+			"cronjob_id": &schema.Schema{
 				Description: "Cronjob ID",
 				Type:        schema.TypeString,
 				Required:    true,
@@ -85,7 +85,7 @@ func dataSourceTrueNASCronjobRead(ctx context.Context, d *schema.ResourceData, m
 	var diags diag.Diagnostics
 
 	c := m.(*api.APIClient)
-	id, err := strconv.Atoi(d.Get("id").(string))
+	id, err := strconv.Atoi(d.Get("cronjob_id").(string))
 
 	if err != nil {
 		return diag.FromErr(err)
