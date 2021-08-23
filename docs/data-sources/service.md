@@ -23,7 +23,11 @@ data "truenas_service" "svc" {
 
 ### Required
 
-- **id** (Number) Service ID
+- **service_id** (Number) Service ID
+
+### Optional
+
+- **id** (String) The ID of this resource.
 
 ### Read-Only
 

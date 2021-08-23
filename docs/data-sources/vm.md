@@ -23,7 +23,11 @@ data "truenas_vm" "vm" {
 
 ### Required
 
-- **id** (String) VM ID
+- **vm_id** (String) VM ID
+
+### Optional
+
+- **id** (String) The ID of this resource.
 
 ### Read-Only
 

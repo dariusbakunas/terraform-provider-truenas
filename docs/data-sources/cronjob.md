@@ -23,7 +23,11 @@ data "truenas_cronjob" "job" {
 
 ### Required
 
-- **id** (String) Cronjob ID
+- **cronjob_id** (String) Cronjob ID
+
+### Optional
+
+- **id** (String) The ID of this resource.
 
 ### Read-Only
 

@@ -23,6 +23,10 @@ data "truenas_dataset" "dataset" {
 
 ### Required
 
+- **dataset_id** (String)
+
+### Optional
+
 - **id** (String) The ID of this resource.
 
 ### Read-Only

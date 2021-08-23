@@ -39,6 +39,7 @@ resource "truenas_zvol" "zv" {
 - **deduplication** (String) Transparently reuse a single copy of duplicated data to save space. Deduplication can improve storage capacity, but is RAM intensive. Compressing data is generally recommended before using deduplication. Deduplicating data is a one-way process. *Deduplicated data cannot be undeduplicated!*.
 - **encryption_algorithm** (String)
 - **force_size** (Boolean) The system restricts creating a zvol that brings the pool to over 80% capacity. Set to force creation of the zvol (not recommended)
+- **id** (String) The ID of this resource.
 - **inherit_encryption** (Boolean) Use the encryption properties of the root dataset.
 - **parent** (String) Parent dataset
 - **readonly** (String) Set to prevent the zvol from being modified
@@ -49,12 +50,12 @@ resource "truenas_zvol" "zv" {
 - **copies** (Number)
 - **encrypted** (Boolean)
 - **encryption_root** (String)
-- **id** (String) The ID of this resource.
 - **key_format** (String)
 - **key_loaded** (Boolean)
 - **locked** (Boolean)
 - **pbkdf2iters** (Number)
 - **ref_reservation** (Number)
 - **reservation** (Number)
+- **zvol_id** (String)
 
 
