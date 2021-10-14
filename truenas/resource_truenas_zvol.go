@@ -47,7 +47,7 @@ func resourceTrueNASZVOL() *schema.Resource {
 				Computed: true,
 			},
 			"deduplication": &schema.Schema{
-				Description: "Transparently reuse a single copy of duplicated data to save space. Deduplication can improve storage capacity, but is RAM intensive. Compressing data is generally recommended before using deduplication. Deduplicating data is a one-way process. *Deduplicated data cannot be undeduplicated!*.",
+				Description:  "Transparently reuse a single copy of duplicated data to save space. Deduplication can improve storage capacity, but is RAM intensive. Compressing data is generally recommended before using deduplication. Deduplicating data is a one-way process. *Deduplicated data cannot be undeduplicated!*.",
 				Type:         schema.TypeString,
 				Optional:     true,
 				Default:      "off",
@@ -102,10 +102,10 @@ func resourceTrueNASZVOL() *schema.Resource {
 			},
 			"parent": &schema.Schema{
 				Description: "Parent dataset",
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  "",
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "",
+				ForceNew:    true,
 			},
 			"pbkdf2iters": &schema.Schema{
 				Type:     schema.TypeInt,

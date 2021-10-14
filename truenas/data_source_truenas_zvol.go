@@ -94,9 +94,9 @@ func dataSourceTrueNASZVOL() *schema.Resource {
 				Computed: true,
 			},
 			"sync": &schema.Schema{
-				Type:         schema.TypeString,
-				Description:  "Sets the data write synchronization. `inherit` takes the sync settings from the parent dataset, `standard` uses the settings that have been requested by the client software, `always` waits for data writes to complete, and `disabled` never waits for writes to complete.",
-				Computed:     true,
+				Type:        schema.TypeString,
+				Description: "Sets the data write synchronization. `inherit` takes the sync settings from the parent dataset, `standard` uses the settings that have been requested by the client software, `always` waits for data writes to complete, and `disabled` never waits for writes to complete.",
+				Computed:    true,
 			},
 			"volsize": &schema.Schema{
 				Type:     schema.TypeInt,
