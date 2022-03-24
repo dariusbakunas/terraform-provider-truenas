@@ -23,17 +23,17 @@ data "truenas_service" "svc" {
 
 ### Required
 
-- **service_id** (Number) Service ID
+- `service_id` (Number) Service ID
 
 ### Optional
 
-- **id** (String) The ID of this resource.
+- `id` (String) The ID of this resource.
 
 ### Read-Only
 
-- **enabled** (Boolean) `true` if service is enabled
-- **name** (String) Service name
-- **pids** (List of Number) List of pids that belong to service
-- **state** (String) Current state: `stopped`, `running`
+- `enabled` (Boolean) `true` if service is enabled
+- `name` (String) Service name
+- `pids` (List of Number) List of pids that belong to service
+- `state` (String) Current state: `stopped`, `running`
 
 
