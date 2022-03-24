@@ -13,7 +13,6 @@ import (
 
 func TestAccResourceTruenasDataset_basic(t *testing.T) {
 	var dataset api.Dataset
-	pool := "Tank"
 	suffix := acctest.RandStringFromCharSet(5, acctest.CharSetAlphaNum)
 	name := fmt.Sprintf("%s-%s", testResourcePrefix, suffix)
 	resourceName := "truenas_dataset.test"
@@ -24,9 +23,10 @@ func TestAccResourceTruenasDataset_basic(t *testing.T) {
 		CheckDestroy: testAccCheckResourceTruenasDatasetDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCheckResourceTruenasDatasetConfig(pool, name),
+				Config: testAccCheckResourceTruenasDatasetConfig(testPoolName, name),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "name", name),
+					resource.TestCheckResourceAttr(resourceName, "pool", testPoolName),
 					resource.TestCheckResourceAttr(resourceName, "comments", "Test dataset"),
 					resource.TestCheckResourceAttr(resourceName, "sync", "standard"),
 					resource.TestCheckResourceAttr(resourceName, "atime", "off"),
@@ -61,13 +61,16 @@ func testAccCheckResourceTruenasDatasetDestroy(s *terraform.State) error {
 		}
 
 		// Try to find the dataset
-		_, _, err := client.DatasetApi.GetDataset(context.Background(), rs.Primary.ID).Execute()
+		_, http, err := client.DatasetApi.GetDataset(context.Background(), rs.Primary.ID).Execute()
 
 		if err == nil {
 			return fmt.Errorf("dataset (%s) still exists", rs.Primary.ID)
 		}
 
-		// TODO: check if error is in fact 404
+		// check if error is in fact 404 (not found)
+		if http.StatusCode != 404 {
+			return fmt.Errorf("Error occured while checking for absence of dataset (%s)", rs.Primary.ID)
+		}
 	}
 
 	return nil
