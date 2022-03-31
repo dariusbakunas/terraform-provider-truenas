@@ -21,29 +21,29 @@ data "truenas_network_configuration" "nc" {}
 
 ### Optional
 
-- **id** (String) The ID of this resource.
+- `id` (String) The ID of this resource.
 
 ### Read-Only
 
-- **domain** (String) TrueNAS domain
-- **hostname** (String) TrueNAS hostname
-- **httpproxy** (String) HTTP proxy address
-- **ipv4gateway** (String) Gateway IPv4 address
-- **ipv6gateway** (String) Gateway IPv6 address
-- **nameserver1** (String) Nameserver 1 IPv4 address
-- **nameserver2** (String) Nameserver 2 IPv4 address
-- **nameserver3** (String) Nameserver 3 IPv4 address
-- **netwait_enabled** (Boolean) `true` if netwait feature is enabled
-- **netwait_ips** (List of String) List of IP addresses to ping if netwait is enabled
-- **service_announcement** (Set of Object) (see [below for nested schema](#nestedatt--service_announcement))
+- `domain` (String) TrueNAS domain
+- `hostname` (String) TrueNAS hostname
+- `httpproxy` (String) HTTP proxy address
+- `ipv4gateway` (String) Gateway IPv4 address
+- `ipv6gateway` (String) Gateway IPv6 address
+- `nameserver1` (String) Nameserver 1 IPv4 address
+- `nameserver2` (String) Nameserver 2 IPv4 address
+- `nameserver3` (String) Nameserver 3 IPv4 address
+- `netwait_enabled` (Boolean) `true` if netwait feature is enabled
+- `netwait_ips` (List of String) List of IP addresses to ping if netwait is enabled
+- `service_announcement` (Set of Object) (see [below for nested schema](#nestedatt--service_announcement))
 
 <a id="nestedatt--service_announcement"></a>
 ### Nested Schema for `service_announcement`
 
 Read-Only:
 
-- **mdns** (Boolean)
-- **netbios** (Boolean)
-- **wsd** (Boolean)
+- `mdns` (Boolean)
+- `netbios` (Boolean)
+- `wsd` (Boolean)
 
 

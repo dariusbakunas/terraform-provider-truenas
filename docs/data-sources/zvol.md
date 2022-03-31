@@ -23,33 +23,33 @@ data "truenas_zvol" "vol" {
 
 ### Required
 
-- **zvol_id** (String)
+- `zvol_id` (String)
 
 ### Optional
 
-- **id** (String) The ID of this resource.
+- `id` (String) The ID of this resource.
 
 ### Read-Only
 
-- **blocksize** (String) Volume blocksize
-- **comments** (String) Any notes about this volume.
-- **compression** (String) Current zvol compression level
-- **copies** (Number)
-- **deduplication** (String) Deduplication can improve storage capacity, but is RAM intensive
-- **encrypted** (Boolean)
-- **encryption_algorithm** (String)
-- **encryption_root** (String)
-- **key_format** (String)
-- **key_loaded** (Boolean)
-- **locked** (Boolean)
-- **name** (String)
-- **parent** (String)
-- **pbkdf2iters** (Number)
-- **pool** (String)
-- **readonly** (String)
-- **ref_reservation** (Number)
-- **reservation** (Number)
-- **sync** (String) Sets the data write synchronization. `inherit` takes the sync settings from the parent dataset, `standard` uses the settings that have been requested by the client software, `always` waits for data writes to complete, and `disabled` never waits for writes to complete.
-- **volsize** (Number)
+- `blocksize` (String) Volume blocksize
+- `comments` (String) Any notes about this volume.
+- `compression` (String) Current zvol compression level
+- `copies` (Number)
+- `deduplication` (String) Deduplication can improve storage capacity, but is RAM intensive
+- `encrypted` (Boolean)
+- `encryption_algorithm` (String)
+- `encryption_root` (String)
+- `key_format` (String)
+- `key_loaded` (Boolean)
+- `locked` (Boolean)
+- `name` (String)
+- `parent` (String)
+- `pbkdf2iters` (Number)
+- `pool` (String)
+- `readonly` (String)
+- `ref_reservation` (Number)
+- `reservation` (Number)
+- `sync` (String) Sets the data write synchronization. `inherit` takes the sync settings from the parent dataset, `standard` uses the settings that have been requested by the client software, `always` waits for data writes to complete, and `disabled` never waits for writes to complete.
+- `volsize` (Number)
 
 

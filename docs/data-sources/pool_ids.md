@@ -21,10 +21,10 @@ data "truenas_pool_ids" "all" {}
 
 ### Optional
 
-- **id** (String) The ID of this resource.
+- `id` (String) The ID of this resource.
 
 ### Read-Only
 
-- **ids** (Set of Number)
+- `ids` (Set of Number)
 
 

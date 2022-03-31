@@ -32,31 +32,31 @@ resource "truenas_cronjob" "cj" {
 
 ### Required
 
-- **command** (String) Command or script that runs on schedule
-- **schedule** (Block List, Min: 1, Max: 1) Cronjob schedule (see [below for nested schema](#nestedblock--schedule))
-- **user** (String) Account that is used to run the job
+- `command` (String) Command or script that runs on schedule
+- `schedule` (Block List, Min: 1, Max: 1) Cronjob schedule (see [below for nested schema](#nestedblock--schedule))
+- `user` (String) Account that is used to run the job
 
 ### Optional
 
-- **description** (String) Optional cronjob description
-- **enabled** (Boolean) `true` if cronjob is enabled
-- **hide_stderr** (Boolean) if `false` any error output is mailed to the user account used to run the command
-- **hide_stdout** (Boolean) if `false` any standard output is mailed to the user account used to run the command
-- **id** (String) The ID of this resource.
+- `description` (String) Optional cronjob description
+- `enabled` (Boolean) `true` if cronjob is enabled
+- `hide_stderr` (Boolean) if `false` any error output is mailed to the user account used to run the command
+- `hide_stdout` (Boolean) if `false` any standard output is mailed to the user account used to run the command
+- `id` (String) The ID of this resource.
 
 ### Read-Only
 
-- **cronjob_id** (String) Cronjob ID
+- `cronjob_id` (String) Cronjob ID
 
 <a id="nestedblock--schedule"></a>
 ### Nested Schema for `schedule`
 
 Optional:
 
-- **dom** (String)
-- **dow** (String)
-- **hour** (String)
-- **minute** (String)
-- **month** (String)
+- `dom` (String)
+- `dow` (String)
+- `hour` (String)
+- `minute` (String)
+- `month` (String)
 
 
