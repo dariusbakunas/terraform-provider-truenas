@@ -33,9 +33,11 @@ func Provider() *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"truenas_cronjob": resourceTrueNASCronjob(),
-			"truenas_dataset": resourceTrueNASDataset(),
-			"truenas_zvol":    resourceTrueNASZVOL(),
+			"truenas_cronjob":   resourceTrueNASCronjob(),
+			"truenas_dataset":   resourceTrueNASDataset(),
+			"truenas_share_nfs": resourceTrueNASShareNFS(),
+			"truenas_share_smb": resourceTrueNASShareSMB(),
+			"truenas_zvol":      resourceTrueNASZVOL(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"truenas_cronjob":               dataSourceTrueNASCronjob(),
@@ -43,6 +45,8 @@ func Provider() *schema.Provider {
 			"truenas_network_configuration": dataSourceTrueNASNetworkConfiguration(),
 			"truenas_pool_ids":              dataSourceTrueNASPoolIDs(),
 			"truenas_service":               dataSourceTrueNASService(),
+			"truenas_share_nfs":             dataSourceTrueNASShareNFS(),
+			"truenas_share_smb":             dataSourceTrueNASShareSMB(),
 			"truenas_vm":                    dataSourceTrueNASVM(),
 			"truenas_zvol":                  dataSourceTrueNASZVOL(),
 		},
