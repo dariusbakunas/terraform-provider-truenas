@@ -43,3 +43,12 @@ func getBoolPtr(b bool) *bool {
 	val := b
 	return &val
 }
+
+func expandStrings(items []interface{}) *[]string {
+	result := make([]string, 0, len(items))
+
+	for _, item := range items {
+		result = append(result, item.(string))
+	}
+	return &result
+}
