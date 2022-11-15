@@ -465,7 +465,11 @@ func dataSourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m
 	resp, _, err := c.DatasetApi.GetDataset(ctx, id).Execute()
 
 	if err != nil {
-		return diag.Errorf("error getting dataset: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error getting dataset: %s\n%s", err, body)
 	}
 
 	if resp.Type != "FILESYSTEM" {

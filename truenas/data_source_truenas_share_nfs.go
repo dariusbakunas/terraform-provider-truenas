@@ -114,7 +114,11 @@ func dataSourceTrueNASShareNFSRead(ctx context.Context, d *schema.ResourceData, 
 	resp, _, err := c.SharingApi.GetShareNFS(ctx, int32(id)).Execute()
 
 	if err != nil {
-		return diag.Errorf("error getting share: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error getting share: %s\n%s", err, body)
 	}
 
 	if resp.Comment != nil {

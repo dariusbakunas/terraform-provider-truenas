@@ -115,7 +115,11 @@ func dataSourceTrueNASZVOLRead(ctx context.Context, d *schema.ResourceData, m in
 	resp, _, err := c.DatasetApi.GetDataset(ctx, id).Execute()
 
 	if err != nil {
-		return diag.Errorf("error getting zvol: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error getting zvol: %s\n%s", err, body)
 	}
 
 	if resp.Type != "VOLUME" {

@@ -282,7 +282,11 @@ func resourceTrueNASZVOLCreate(ctx context.Context, d *schema.ResourceData, m in
 	resp, _, err := c.DatasetApi.CreateDataset(ctx).CreateDatasetParams(input).Execute()
 
 	if err != nil {
-		return diag.Errorf("error creating zvol: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error creating zvol: %s\n%s", err, body)
 	}
 
 	d.SetId(resp.Id)
@@ -301,7 +305,11 @@ func resourceTrueNASZVOLDelete(ctx context.Context, d *schema.ResourceData, m in
 	_, err := c.DatasetApi.DeleteDataset(ctx, id).Execute()
 
 	if err != nil {
-		return diag.Errorf("error deleting dataset: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error deleting dataset: %s\n%s", err, body)
 	}
 
 	log.Printf("[INFO] TrueNAS zvol (%s) deleted", id)
@@ -354,7 +362,11 @@ func resourceTrueNASZVOLUpdate(ctx context.Context, d *schema.ResourceData, m in
 	_, _, err := c.DatasetApi.UpdateDataset(ctx, d.Id()).UpdateDatasetParams(input).Execute()
 
 	if err != nil {
-		return diag.Errorf("error updating zvol: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error updating zvol: %s\n%s", err, body)
 	}
 
 	return resourceTrueNASZVOLRead(ctx, d, m)

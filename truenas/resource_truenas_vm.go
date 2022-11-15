@@ -95,7 +95,7 @@ func resourceTrueNASVM() *schema.Resource {
 							Description:  "Device type",
 							Type:         schema.TypeString,
 							Required:     true,
-							ValidateFunc: validation.StringInSlice([]string{"NIC", "DISK", "CDROM", "PCI", "DISPLAY", "RAW"}, false),
+							ValidateFunc: validation.StringInSlice([]string{"NIC", "DISK", "CDROM", "PCI", "DISPLAY", "RAW", "TEST"}, false),
 						},
 						"order": &schema.Schema{
 							Description: "Device order",
@@ -263,7 +263,11 @@ func resourceTrueNASVMCreate(ctx context.Context, d *schema.ResourceData, m inte
 	resp, _, err := c.VmApi.CreateVM(ctx).CreateVMParams(input).Execute()
 
 	if err != nil {
-		return diag.Errorf("error creating VM: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error creating VM: %s\n%s", err, body)
 	}
 
 	d.SetId(strconv.Itoa(int(resp.Id)))
@@ -282,7 +286,12 @@ func resourceTrueNASVMDelete(ctx context.Context, d *schema.ResourceData, m inte
 	_, err = c.VmApi.DeleteVM(ctx, int32(id)).Execute()
 
 	if err != nil {
-		return diag.Errorf("error deleting VM: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+
+		return diag.Errorf("error deleting VM: %s\n%s", err, body)
 	}
 
 	d.SetId("")
@@ -347,7 +356,7 @@ func resourceTrueNASVMUpdate(ctx context.Context, d *schema.ResourceData, m inte
 		}
 	}
 
-	_, resp, err := c.VmApi.UpdateVM(ctx, int32(id)).UpdateVMParams(input).Execute()
+	_, _, err = c.VmApi.UpdateVM(ctx, int32(id)).UpdateVMParams(input).Execute()
 
 	// TODO: handle error response like:
 	//{{
@@ -360,7 +369,12 @@ func resourceTrueNASVMUpdate(ctx context.Context, d *schema.ResourceData, m inte
 	//}}
 
 	if err != nil {
-		return diag.Errorf("error updating VM: %s\n%+v", err, resp)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+
+		return diag.Errorf("error updating VM: %s\n%s", err, body)
 	}
 
 	return resourceTrueNASVMRead(ctx, d, m)

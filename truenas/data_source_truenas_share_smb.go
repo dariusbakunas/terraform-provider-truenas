@@ -157,7 +157,11 @@ func dataSourceTrueNASShareSMBRead(ctx context.Context, d *schema.ResourceData, 
 	resp, _, err := c.SharingApi.GetShareSMB(ctx, int32(id)).Execute()
 
 	if err != nil {
-		return diag.Errorf("error getting share: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error getting share: %s\n%s", err, body)
 	}
 
 	d.Set("path", resp.Path)

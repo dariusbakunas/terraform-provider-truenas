@@ -246,7 +246,11 @@ func resourceTrueNASShareSMBCreate(ctx context.Context, d *schema.ResourceData, 
 	resp, _, err := c.SharingApi.CreateShareSMB(ctx).CreateShareSMBParams(input).Execute()
 
 	if err != nil {
-		return diag.Errorf("error creating SMB share: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error creating SMB share: %s\n%s", err, body)
 	}
 
 	d.SetId(strconv.Itoa(int(resp.Id)))
@@ -269,7 +273,11 @@ func resourceTrueNASShareSMBDelete(ctx context.Context, d *schema.ResourceData, 
 	_, err = c.SharingApi.RemoveShareSMB(ctx, int32(id)).Execute()
 
 	if err != nil {
-		return diag.Errorf("error deleting SMB share: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error deleting SMB share: %s\n%s", err, body)
 	}
 
 	log.Printf("[INFO] TrueNAS SMB share (%s) deleted", strconv.Itoa(id))
@@ -295,7 +303,11 @@ func resourceTrueNASShareSMBUpdate(ctx context.Context, d *schema.ResourceData, 
 	_, _, err = c.SharingApi.UpdateShareSMB(ctx, int32(id)).CreateShareSMBParams(share).Execute()
 
 	if err != nil {
-		return diag.Errorf("error updating SMB share: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error updating SMB share: %s\n%s", err, body)
 	}
 
 	return resourceTrueNASShareSMBRead(ctx, d, m)

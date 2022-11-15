@@ -107,7 +107,11 @@ func resourceTrueNASCronjobRead(ctx context.Context, d *schema.ResourceData, m i
 	resp, _, err := c.CronjobApi.GetCronJob(ctx, int32(id)).Execute()
 
 	if err != nil {
-		return diag.Errorf("error getting cronjob: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error getting cronjob: %s\n%s", err, body)
 	}
 
 	d.Set("cronjob_id", strconv.Itoa(int(*resp.Id)))
@@ -141,16 +145,16 @@ func resourceTrueNASCronjobCreate(ctx context.Context, d *schema.ResourceData, m
 	c := m.(*api.APIClient)
 	job := expandJobInput(d)
 
-	resp, r, err := c.CronjobApi.CreateCronJob(ctx).
+	resp, _, err := c.CronjobApi.CreateCronJob(ctx).
 		CreateCronjobParams(job).
 		Execute()
 
 	if err != nil {
-		if r != nil {
-			return diag.Errorf("error creating cronjob: %s - %s", err, r.Status)
-		} else {
-			return diag.Errorf("error creating cronjob: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
 		}
+		return diag.Errorf("error creating cronjob: %s\n%s", err, body)
 	}
 
 	d.SetId(strconv.Itoa(int(*resp.Id)))
@@ -171,7 +175,11 @@ func resourceTrueNASCronjobUpdate(ctx context.Context, d *schema.ResourceData, m
 	_, _, err = c.CronjobApi.UpdateCronJob(ctx, int32(id)).CreateCronjobParams(job).Execute()
 
 	if err != nil {
-		return diag.Errorf("error updating cronjob: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error updating cronjob: %s\n%s", err, body)
 	}
 
 	return resourceTrueNASCronjobRead(ctx, d, m)
@@ -191,7 +199,11 @@ func resourceTrueNASCronjobDelete(ctx context.Context, d *schema.ResourceData, m
 	_, err = c.CronjobApi.DeleteCronJob(ctx, int32(id)).Execute()
 
 	if err != nil {
-		return diag.Errorf("error deleting cronjob: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error deleting cronjob: %s\n%s", err, body)
 	}
 	d.SetId("")
 

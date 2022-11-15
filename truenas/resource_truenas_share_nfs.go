@@ -193,7 +193,11 @@ func resourceTrueNASShareNFSCreate(ctx context.Context, d *schema.ResourceData, 
 	resp, _, err := c.SharingApi.CreateShareNFS(ctx).CreateShareNFSParams(input).Execute()
 
 	if err != nil {
-		return diag.Errorf("error creating NFS share: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error creating NFS share: %s\n%s", err, body)
 	}
 
 	d.SetId(strconv.Itoa(int(resp.Id)))
@@ -216,7 +220,11 @@ func resourceTrueNASShareNFSDelete(ctx context.Context, d *schema.ResourceData, 
 	_, err = c.SharingApi.RemoveShareNFS(ctx, int32(id)).Execute()
 
 	if err != nil {
-		return diag.Errorf("error deleting NFS share: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error deleting NFS share: %s\n%s", err, body)
 	}
 
 	log.Printf("[INFO] TrueNAS NFS share (%s) deleted", strconv.Itoa(id))
@@ -238,7 +246,11 @@ func resourceTrueNASShareNFSUpdate(ctx context.Context, d *schema.ResourceData, 
 	_, _, err = c.SharingApi.UpdateShareNFS(ctx, int32(id)).CreateShareNFSParams(share).Execute()
 
 	if err != nil {
-		return diag.Errorf("error updating NFS share: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error updating NFS share: %s\n%s", err, body)
 	}
 
 	return resourceTrueNASShareNFSRead(ctx, d, m)

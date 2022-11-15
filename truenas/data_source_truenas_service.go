@@ -55,7 +55,11 @@ func dataSourceTrueNASServiceRead(ctx context.Context, d *schema.ResourceData, m
 	resp, _, err := c.ServiceApi.GetService(ctx, int32(id)).Execute()
 
 	if err != nil {
-		return diag.Errorf("error getting service: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error getting service: %s\n%s", err, body)
 	}
 
 	d.Set("name", resp.Service)

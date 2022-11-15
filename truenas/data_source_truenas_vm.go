@@ -130,7 +130,11 @@ func dataSourceTrueNASVMRead(ctx context.Context, d *schema.ResourceData, m inte
 	resp, _, err := c.VmApi.GetVM(ctx, int32(id)).Execute()
 
 	if err != nil {
-		return diag.Errorf("error getting VM: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error getting VM: %s\n%s", err, body)
 	}
 
 	d.Set("name", resp.Name)
