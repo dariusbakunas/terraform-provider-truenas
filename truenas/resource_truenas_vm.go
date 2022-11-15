@@ -95,7 +95,7 @@ func resourceTrueNASVM() *schema.Resource {
 							Description:  "Device type",
 							Type:         schema.TypeString,
 							Required:     true,
-							ValidateFunc: validation.StringInSlice([]string{"NIC", "DISK", "CDROM", "PCI", "DISPLAY", "RAW", "TEST"}, false),
+							ValidateFunc: validation.StringInSlice([]string{"NIC", "DISK", "CDROM", "PCI", "DISPLAY", "RAW"}, false),
 						},
 						"order": &schema.Schema{
 							Description: "Device order",
