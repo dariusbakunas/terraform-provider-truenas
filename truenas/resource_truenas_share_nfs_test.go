@@ -38,8 +38,8 @@ func TestAccResourceTruenasShareNFS_basic(t *testing.T) {
 					// make sure the Terraform resource matches
 					resource.TestCheckTypeSetElemAttr(resourceName, "paths.*", fmt.Sprintf("/mnt/%s/%s", testPoolName, datasetName)),
 					resource.TestCheckResourceAttr(resourceName, "comment", "Testing NFS share"),
-					resource.TestCheckTypeSetElemAttr(resourceName, "hosts.*", "10.1.0.1"),
-					resource.TestCheckTypeSetElemAttr(resourceName, "hosts.*", "foo.bar.baz"),
+					resource.TestCheckTypeSetElemAttr(resourceName, "hosts.*", "8.8.8.8"),
+					resource.TestCheckTypeSetElemAttr(resourceName, "hosts.*", "google.com"),
 					resource.TestCheckResourceAttr(resourceName, "alldirs", "false"),
 					resource.TestCheckResourceAttr(resourceName, "ro", "true"),
 					resource.TestCheckResourceAttr(resourceName, "quiet", "false"),
@@ -52,7 +52,7 @@ func TestAccResourceTruenasShareNFS_basic(t *testing.T) {
 					// resource.TestCheckResourceAttr(resourceName, "security.0", "krb5i"),
 					// resource.TestCheckResourceAttr(resourceName, "security.1", "sys"),
 					resource.TestCheckResourceAttr(resourceName, "enabled", "true"),
-					resource.TestCheckTypeSetElemAttr(resourceName, "networks.*", "10.1.1.0/24"),
+					resource.TestCheckTypeSetElemAttr(resourceName, "networks.*", "10.128.0.0/9"),
 				),
 			},
 		},
@@ -72,8 +72,8 @@ func testAccCheckResourceTruenasShareNFSConfig(pool string, datasetName string) 
 		]
 		comment = "Testing NFS share"
 		hosts = [
-			"10.1.0.1",
-			"foo.bar.baz",
+			"8.8.8.8",
+			"google.com",
 		]
 		alldirs = false
 		ro = true
@@ -88,7 +88,7 @@ func testAccCheckResourceTruenasShareNFSConfig(pool string, datasetName string) 
 		# ]
 		enabled = true
 		networks = [
-			"10.1.1.0/24",
+			"10.128.0.0/9",
 		]
 	}
 	`, datasetName, pool)
@@ -123,7 +123,7 @@ func testAccCheckTruenasShareNFSResourceExists(n string, share *api.ShareNFS) re
 			return fmt.Errorf("nfs share not found")
 		}
 
-		share = resp
+		*share = *resp
 		return nil
 	}
 }
@@ -139,7 +139,7 @@ func testAccCheckTruenasShareNFSResourceAttributes(t *testing.T, n string, share
 			return fmt.Errorf("remote comment for nfs share does not match expected")
 		}
 
-		if !assert.ElementsMatch(t, share.Hosts, []string{"10.1.0.1", "foo.bar.baz"}) {
+		if !assert.ElementsMatch(t, share.Hosts, []string{"8.8.8.8", "google.com"}) {
 			return fmt.Errorf("remote hosts for nfs share do not match expected")
 		}
 
@@ -180,7 +180,7 @@ func testAccCheckTruenasShareNFSResourceAttributes(t *testing.T, n string, share
 			return fmt.Errorf("remote enabled for nfs share does not match expected")
 		}
 
-		if !assert.ElementsMatch(t, share.Networks, []string{"10.1.1.0/24"}) {
+		if !assert.ElementsMatch(t, share.Networks, []string{"10.128.0.0/9"}) {
 			return fmt.Errorf("remote networks for nfs share do not match expected")
 		}
 

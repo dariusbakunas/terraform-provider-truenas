@@ -27,8 +27,8 @@ func TestAccDataSourceTruenasShareNFS_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckTypeSetElemAttr(resourceName, "paths.*", fmt.Sprintf("/mnt/%s/%s", testPoolName, dataset_name)),
 					resource.TestCheckResourceAttr(resourceName, "comment", "Testing NFS share"),
-					resource.TestCheckTypeSetElemAttr(resourceName, "hosts.*", "10.1.0.1"),
-					resource.TestCheckTypeSetElemAttr(resourceName, "hosts.*", "foo.bar.baz"),
+					resource.TestCheckTypeSetElemAttr(resourceName, "hosts.*", "8.8.8.8"),
+					resource.TestCheckTypeSetElemAttr(resourceName, "hosts.*", "google.com"),
 					resource.TestCheckResourceAttr(resourceName, "alldirs", "false"),
 					resource.TestCheckResourceAttr(resourceName, "ro", "true"),
 					resource.TestCheckResourceAttr(resourceName, "quiet", "false"),
@@ -41,7 +41,7 @@ func TestAccDataSourceTruenasShareNFS_basic(t *testing.T) {
 					// resource.TestCheckResourceAttr(resourceName, "security.0", "krb5i"),
 					// resource.TestCheckResourceAttr(resourceName, "security.1", "sys"),
 					resource.TestCheckResourceAttr(resourceName, "enabled", "true"),
-					resource.TestCheckTypeSetElemAttr(resourceName, "networks.*", "10.1.1.0/24"),
+					resource.TestCheckTypeSetElemAttr(resourceName, "networks.*", "10.128.0.0/9"),
 				),
 			},
 		},
@@ -60,12 +60,12 @@ func testAccCheckDataSourceTruenasShareNFSConfig(pool string, dataset_name strin
 			truenas_dataset.test,
 		]
 		paths = [
-			resource.truenas_dataset.test.mount_point,
+			truenas_dataset.test.mount_point,
 		]
 		comment = "Testing NFS share"
 		hosts = [
-			"10.1.0.1",
-			"foo.bar.baz",
+			"8.8.8.8",
+			"google.com",
 		]
 		alldirs = false
 		ro = true
@@ -80,7 +80,7 @@ func testAccCheckDataSourceTruenasShareNFSConfig(pool string, dataset_name strin
 		# ]
 		enabled = true
 		networks = [
-			"10.1.1.0/24",
+			"10.128.0.0/9",
 		]
 	}
 
