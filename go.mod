@@ -5,7 +5,7 @@ go 1.17
 //replace github.com/dariusbakunas/truenas-go-sdk => /Users/darius/Programming/truenas-go-sdk
 
 require (
-	github.com/dariusbakunas/truenas-go-sdk v0.6.2
+	github.com/dariusbakunas/truenas-go-sdk v0.9.0
 	github.com/hashicorp/terraform-plugin-docs v0.7.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.12.0
 	github.com/stretchr/testify v1.7.0

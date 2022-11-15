@@ -44,11 +44,19 @@ func getBoolPtr(b bool) *bool {
 	return &val
 }
 
-func expandStrings(items []interface{}) *[]string {
+func expandStrings(items []interface{}) []string {
 	result := make([]string, 0, len(items))
 
 	for _, item := range items {
 		result = append(result, item.(string))
 	}
-	return &result
+	return result
+}
+
+func convertStringMap(v map[string]interface{}) map[string]string {
+	m := make(map[string]string)
+	for k, val := range v {
+		m[k] = val.(string)
+	}
+	return m
 }
