@@ -42,11 +42,11 @@ resource "truenas_cronjob" "cj" {
 - `enabled` (Boolean) `true` if cronjob is enabled
 - `hide_stderr` (Boolean) if `false` any error output is mailed to the user account used to run the command
 - `hide_stdout` (Boolean) if `false` any standard output is mailed to the user account used to run the command
-- `id` (String) The ID of this resource.
 
 ### Read-Only
 
 - `cronjob_id` (String) Cronjob ID
+- `id` (String) The ID of this resource.
 
 <a id="nestedblock--schedule"></a>
 ### Nested Schema for `schedule`

@@ -25,10 +25,6 @@ data "truenas_vm" "vm" {
 
 - `vm_id` (String) VM ID
 
-### Optional
-
-- `id` (String) The ID of this resource.
-
 ### Read-Only
 
 - `autostart` (Boolean) `true` if VM is set to autostart
@@ -36,6 +32,7 @@ data "truenas_vm" "vm" {
 - `cores` (Number) Number of CPU cores
 - `description` (String) VM description
 - `device` (Set of Object) (see [below for nested schema](#nestedatt--device))
+- `id` (String) The ID of this resource.
 - `memory` (Number) Total memory available for VM (bytes)
 - `name` (String) VM name
 - `shutdown_timeout` (Number) Shutdown timeout in seconds

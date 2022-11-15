@@ -52,7 +52,6 @@ resource "truenas_share_nfs" "nfs" {
 - `comment` (String) Any notes about this NFS share
 - `enabled` (Boolean) Enable this share
 - `hosts` (Set of String) Authorized hosts (IP/hostname)
-- `id` (String) The ID of this resource.
 - `mapall_group` (String) Mapall group
 - `mapall_user` (String) Mapall user
 - `maproot_group` (String) Maproot group
@@ -64,6 +63,7 @@ resource "truenas_share_nfs" "nfs" {
 
 ### Read-Only
 
+- `id` (String) The ID of this resource.
 - `sharenfs_id` (Number) NFS Share ID
 
 

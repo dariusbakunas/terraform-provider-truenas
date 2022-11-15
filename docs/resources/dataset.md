@@ -66,7 +66,6 @@ resource "truenas_dataset" "test" {
 - `encryption_key` (String, Sensitive)
 - `exec` (String)
 - `generate_key` (Boolean)
-- `id` (String) The ID of this resource.
 - `inherit_encryption` (Boolean)
 - `parent` (String)
 - `passphrase` (String, Sensitive)
@@ -88,6 +87,7 @@ resource "truenas_dataset" "test" {
 
 - `acl_type` (String)
 - `dataset_id` (String)
+- `id` (String) The ID of this resource.
 - `managed_by` (String)
 - `mount_point` (String)
 

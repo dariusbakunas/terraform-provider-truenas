@@ -25,10 +25,6 @@ data "truenas_share_smb" "smb" {
 
 - `sharesmb_id` (Number) SMB Share ID
 
-### Optional
-
-- `id` (String) The ID of this resource.
-
 ### Read-Only
 
 - `aapl_name_mangling` (Boolean) Use Apple-style Character Encoding
@@ -44,6 +40,7 @@ data "truenas_share_smb" "smb" {
 - `home` (Boolean) Use as home share
 - `hostsallow` (Set of String) Authorized hosts (IP/hostname)
 - `hostsdeny` (Set of String) Disallowed hosts (IP/hostname). Pass 'ALL' to use whitelist model.
+- `id` (String) The ID of this resource.
 - `locked` (Boolean) Locking status of this share
 - `name` (String) SMB share name
 - `path` (String) Path to shared directory

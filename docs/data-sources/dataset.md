@@ -25,10 +25,6 @@ data "truenas_dataset" "dataset" {
 
 - `dataset_id` (String)
 
-### Optional
-
-- `id` (String) The ID of this resource.
-
 ### Read-Only
 
 - `acl_mode` (String) Determine how chmod behaves when adjusting file ACLs. See the zfs(8) aclmode property.
@@ -43,6 +39,7 @@ data "truenas_dataset" "dataset" {
 - `encryption_algorithm` (String)
 - `encryption_root` (String)
 - `exec` (String) `on` if processes can be executed from within this dataset.
+- `id` (String) The ID of this resource.
 - `inherit_encryption` (Boolean)
 - `key_format` (String)
 - `key_loaded` (Boolean)

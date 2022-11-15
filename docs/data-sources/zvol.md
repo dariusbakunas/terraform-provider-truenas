@@ -25,10 +25,6 @@ data "truenas_zvol" "vol" {
 
 - `zvol_id` (String)
 
-### Optional
-
-- `id` (String) The ID of this resource.
-
 ### Read-Only
 
 - `blocksize` (String) Volume blocksize
@@ -39,6 +35,7 @@ data "truenas_zvol" "vol" {
 - `encrypted` (Boolean)
 - `encryption_algorithm` (String)
 - `encryption_root` (String)
+- `id` (String) The ID of this resource.
 - `key_format` (String)
 - `key_loaded` (Boolean)
 - `locked` (Boolean)

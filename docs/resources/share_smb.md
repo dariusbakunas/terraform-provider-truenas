@@ -65,7 +65,6 @@ resource "truenas_share_smb" "smb" {
 - `home` (Boolean) Use as home share
 - `hostsallow` (Set of String) Authorized hosts (IP/hostname)
 - `hostsdeny` (Set of String) Disallowed hosts (IP/hostname). Pass 'ALL' to use whitelist model.
-- `id` (String) The ID of this resource.
 - `name` (String) SMB share name. Defaults to last part of shared path.
 - `path_suffix` (String) Append a suffix to the share connection path. This is used to provide unique shares on a per-user, per-computer, or per-IP address basis.
 - `purpose` (String) You can set a share purpose to apply and lock pre-determined advanced options for the share.
@@ -77,6 +76,7 @@ resource "truenas_share_smb" "smb" {
 
 ### Read-Only
 
+- `id` (String) The ID of this resource.
 - `sharesmb_id` (Number) SMB Share ID
 - `vuid` (String) Share VUID (set when using as TimeMachine share)
 
