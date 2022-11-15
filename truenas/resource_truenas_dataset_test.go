@@ -159,7 +159,7 @@ func testAccCheckTruenasDatasetResourceExists(n string, dataset *api.Dataset) re
 			return fmt.Errorf("dataset not found")
 		}
 
-		*dataset = resp
+		dataset = resp
 		return nil
 	}
 }

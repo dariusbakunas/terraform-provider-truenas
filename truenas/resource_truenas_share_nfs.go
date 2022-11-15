@@ -137,7 +137,7 @@ func resourceTrueNASShareNFSRead(ctx context.Context, d *schema.ResourceData, m 
 	}
 
 	if resp.Hosts != nil {
-		if err := d.Set("hosts", flattenStringList(*resp.Hosts)); err != nil {
+		if err := d.Set("hosts", flattenStringList(resp.Hosts)); err != nil {
 			return diag.Errorf("error setting hosts: %s", err)
 		}
 	}
@@ -163,7 +163,7 @@ func resourceTrueNASShareNFSRead(ctx context.Context, d *schema.ResourceData, m 
 	}
 
 	if resp.Security != nil {
-		if err := d.Set("security", flattenStringList(*resp.Security)); err != nil {
+		if err := d.Set("security", flattenStringList(resp.Security)); err != nil {
 			return diag.Errorf("error setting security: %s", err)
 		}
 	}
@@ -175,7 +175,7 @@ func resourceTrueNASShareNFSRead(ctx context.Context, d *schema.ResourceData, m 
 	}
 
 	if resp.Networks != nil {
-		if err := d.Set("networks", flattenStringList(*resp.Networks)); err != nil {
+		if err := d.Set("networks", flattenStringList(resp.Networks)); err != nil {
 			return diag.Errorf("error setting networks: %s", err)
 		}
 	}
@@ -246,7 +246,7 @@ func resourceTrueNASShareNFSUpdate(ctx context.Context, d *schema.ResourceData, 
 
 func expandShareNFS(d *schema.ResourceData) api.CreateShareNFSParams {
 	share := api.CreateShareNFSParams{
-		Paths: *expandStrings(d.Get("paths").(*schema.Set).List()),
+		Paths: expandStrings(d.Get("paths").(*schema.Set).List()),
 	}
 
 	if comment, ok := d.GetOk("comment"); ok {

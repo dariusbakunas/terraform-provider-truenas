@@ -193,13 +193,13 @@ func resourceTrueNASShareSMBRead(ctx context.Context, d *schema.ResourceData, m 
 	}
 
 	if resp.Hostsallow != nil {
-		if err := d.Set("hostsallow", flattenStringList(*resp.Hostsallow)); err != nil {
+		if err := d.Set("hostsallow", flattenStringList(resp.Hostsallow)); err != nil {
 			return diag.Errorf("error setting hostsallow: %s", err)
 		}
 	}
 
 	if resp.Hostsdeny != nil {
-		if err := d.Set("hostsdeny", flattenStringList(*resp.Hostsdeny)); err != nil {
+		if err := d.Set("hostsdeny", flattenStringList(resp.Hostsdeny)); err != nil {
 			return diag.Errorf("error setting hostsdeny: %s", err)
 		}
 	}

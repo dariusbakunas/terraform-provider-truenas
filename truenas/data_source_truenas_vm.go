@@ -168,7 +168,7 @@ func dataSourceTrueNASVMRead(ctx context.Context, d *schema.ResourceData, m inte
 	}
 
 	if resp.Devices != nil {
-		if err := d.Set("device", flattenVMDevices(*resp.Devices)); err != nil {
+		if err := d.Set("device", flattenVMDevices(resp.Devices)); err != nil {
 			return diag.Errorf("error setting VM devices: %s", err)
 		}
 	}
@@ -184,21 +184,25 @@ func dataSourceTrueNASVMRead(ctx context.Context, d *schema.ResourceData, m inte
 	return diags
 }
 
-func flattenVMDevices(d []api.VMDevices) []interface{} {
+func flattenVMDevices(d []api.VMDevice) []interface{} {
 	res := make([]interface{}, len(d))
 
 	for i, d := range d {
 		device := map[string]interface{}{}
 
-		device["id"] = strconv.Itoa(int(d.Id))
+		device["id"] = strconv.Itoa(int(*d.Id))
 		device["type"] = d.Dtype
 
 		if d.Order != nil {
 			device["order"] = *d.Order
 		}
 
+		if d.Vm != nil {
+			device["vm"] = *d.Vm
+		}
+
 		if d.Attributes != nil {
-			device["attributes"] = flattenVMDeviceAttributes(*d.Attributes)
+			device["attributes"] = flattenVMDeviceAttributes(d.Attributes)
 		}
 
 		res[i] = device

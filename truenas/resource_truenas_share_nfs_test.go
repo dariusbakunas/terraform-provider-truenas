@@ -123,7 +123,7 @@ func testAccCheckTruenasShareNFSResourceExists(n string, share *api.ShareNFS) re
 			return fmt.Errorf("nfs share not found")
 		}
 
-		*share = resp
+		share = resp
 		return nil
 	}
 }
@@ -139,7 +139,7 @@ func testAccCheckTruenasShareNFSResourceAttributes(t *testing.T, n string, share
 			return fmt.Errorf("remote comment for nfs share does not match expected")
 		}
 
-		if !assert.ElementsMatch(t, *share.Hosts, []string{"10.1.0.1", "foo.bar.baz"}) {
+		if !assert.ElementsMatch(t, share.Hosts, []string{"10.1.0.1", "foo.bar.baz"}) {
 			return fmt.Errorf("remote hosts for nfs share do not match expected")
 		}
 
@@ -172,7 +172,7 @@ func testAccCheckTruenasShareNFSResourceAttributes(t *testing.T, n string, share
 		}
 
 		// for security, order would matter
-		if !reflect.DeepEqual(*share.Security, []string{}) {
+		if !reflect.DeepEqual(share.Security, []string{}) {
 			return fmt.Errorf("remote security for nfs share not empty as expected: %#v", share.Security)
 		}
 
@@ -180,7 +180,7 @@ func testAccCheckTruenasShareNFSResourceAttributes(t *testing.T, n string, share
 			return fmt.Errorf("remote enabled for nfs share does not match expected")
 		}
 
-		if !assert.ElementsMatch(t, *share.Networks, []string{"10.1.1.0/24"}) {
+		if !assert.ElementsMatch(t, share.Networks, []string{"10.1.1.0/24"}) {
 			return fmt.Errorf("remote networks for nfs share do not match expected")
 		}
 

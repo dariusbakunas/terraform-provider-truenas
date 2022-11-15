@@ -140,7 +140,7 @@ func dataSourceTrueNASNetworkConfigurationRead(ctx context.Context, d *schema.Re
 	}
 
 	if config.NetwaitIp != nil {
-		if err := d.Set("netwait_ips", flattenStringList(*config.NetwaitIp)); err != nil {
+		if err := d.Set("netwait_ips", flattenStringList(config.NetwaitIp)); err != nil {
 			return diag.Errorf("error setting netwait_ips: %s", err)
 		}
 	}

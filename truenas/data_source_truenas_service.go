@@ -62,7 +62,7 @@ func dataSourceTrueNASServiceRead(ctx context.Context, d *schema.ResourceData, m
 	d.Set("enabled", *resp.Enable)
 
 	if resp.Pids != nil {
-		d.Set("pids", flattenInt32List(*resp.Pids))
+		d.Set("pids", flattenInt32List(resp.Pids))
 	}
 
 	if resp.State != nil {

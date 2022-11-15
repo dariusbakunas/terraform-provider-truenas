@@ -482,7 +482,7 @@ func dataSourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m
 
 	d.Set("name", dpath.Name)
 
-	diags = append(diags, updateDatasetResourceFromResponse(&resp, d)...)
+	diags = append(diags, updateDatasetResourceFromResponse(resp, d)...)
 
 	d.SetId(resp.Id)
 
