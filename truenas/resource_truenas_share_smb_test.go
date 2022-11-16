@@ -97,7 +97,7 @@ func testAccCheckResourceTruenasShareSMBConfig(pool string, datasetName string) 
 	}
 
 	resource "truenas_share_smb" "smb" {
-		path = resource.truenas_dataset.test.mount_point
+		path = truenas_dataset.test.mount_point
 		path_suffix = "%%U"
 		purpose = "NO_PRESET"
 		comment = "Testing SMB share"

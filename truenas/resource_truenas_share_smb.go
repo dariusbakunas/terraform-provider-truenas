@@ -19,6 +19,9 @@ func resourceTrueNASShareSMB() *schema.Resource {
 		ReadContext:   resourceTrueNASShareSMBRead,
 		UpdateContext: resourceTrueNASShareSMBUpdate,
 		DeleteContext: resourceTrueNASShareSMBDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 		Schema: map[string]*schema.Schema{
 			"sharesmb_id": &schema.Schema{
 				Description: "SMB Share ID",

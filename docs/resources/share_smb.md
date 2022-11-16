@@ -80,4 +80,13 @@ resource "truenas_share_smb" "smb" {
 - `sharesmb_id` (Number) SMB Share ID
 - `vuid` (String) Share VUID (set when using as TimeMachine share)
 
+## Import
 
+Import is supported using the following syntax:
+
+```shell
+terraform import truenas_share_smb.default {{sharesmb_id}}
+
+# Example:
+tf import truenas_share_smb.default "3"
+```
