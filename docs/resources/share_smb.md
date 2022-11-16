@@ -88,5 +88,5 @@ Import is supported using the following syntax:
 terraform import truenas_share_smb.default {{sharesmb_id}}
 
 # Example:
-tf import truenas_share_smb.default "3"
+terraform import truenas_share_smb.default "3"
 ```

@@ -1,4 +1,4 @@
-terraform import truenas_share_nfs.default {{nfs_share_id}}
+terraform import truenas_share_nfs.default {{sharenfs_id}}
 
 # Example:
-tf import truenas_share_nfs.default "14"
+terraform import truenas_share_nfs.default "14"

@@ -15,7 +15,7 @@ Manage ZFS Volume (zvol), use of TF `prevent_destroy` (https://www.terraform.io/
 ```terraform
 resource "truenas_zvol" "zv" {
   pool = "Tank"
-  name = "TF ZVOL"
+  name = "TestZVOL"
   volsize = 1024 * 1024 * 1024 // 1GiB
   comments = "Test comment"
   compression = "lz4"
@@ -58,4 +58,13 @@ resource "truenas_zvol" "zv" {
 - `reservation` (Number)
 - `zvol_id` (String)
 
+## Import
 
+Import is supported using the following syntax:
+
+```shell
+terraform import truenas_zvol.default {{zvol_id}}
+
+# Example:
+terraform import truenas_zvol.default "Tank/TestZVOL"
+```
