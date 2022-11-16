@@ -114,7 +114,11 @@ func dataSourceTrueNASShareNFSRead(ctx context.Context, d *schema.ResourceData, 
 	resp, _, err := c.SharingApi.GetShareNFS(ctx, int32(id)).Execute()
 
 	if err != nil {
-		return diag.Errorf("error getting share: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error getting share: %s\n%s", err, body)
 	}
 
 	if resp.Comment != nil {
@@ -122,7 +126,7 @@ func dataSourceTrueNASShareNFSRead(ctx context.Context, d *schema.ResourceData, 
 	}
 
 	if resp.Hosts != nil {
-		if err := d.Set("hosts", flattenStringList(*resp.Hosts)); err != nil {
+		if err := d.Set("hosts", flattenStringList(resp.Hosts)); err != nil {
 			return diag.Errorf("error setting hosts: %s", err)
 		}
 	}
@@ -148,7 +152,7 @@ func dataSourceTrueNASShareNFSRead(ctx context.Context, d *schema.ResourceData, 
 	}
 
 	if resp.Security != nil {
-		if err := d.Set("security", flattenStringList(*resp.Security)); err != nil {
+		if err := d.Set("security", flattenStringList(resp.Security)); err != nil {
 			return diag.Errorf("error setting security: %s", err)
 		}
 	}
@@ -161,7 +165,7 @@ func dataSourceTrueNASShareNFSRead(ctx context.Context, d *schema.ResourceData, 
 	}
 
 	if resp.Networks != nil {
-		if err := d.Set("networks", flattenStringList(*resp.Networks)); err != nil {
+		if err := d.Set("networks", flattenStringList(resp.Networks)); err != nil {
 			return diag.Errorf("error setting networks: %s", err)
 		}
 	}

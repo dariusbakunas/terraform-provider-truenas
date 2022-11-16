@@ -25,16 +25,13 @@ data "truenas_share_nfs" "nfs" {
 
 - `sharenfs_id` (Number) NFS Share ID
 
-### Optional
-
-- `id` (String) The ID of this resource.
-
 ### Read-Only
 
 - `alldirs` (Boolean) Allow mounting subdirectories
 - `comment` (String) Any notes about this NFS share
 - `enabled` (Boolean) Enable this share
 - `hosts` (Set of String) Authorized hosts (IP/hostname)
+- `id` (String) The ID of this resource.
 - `locked` (Boolean) Locked status
 - `mapall_group` (String) Mapall group
 - `mapall_user` (String) Mapall user

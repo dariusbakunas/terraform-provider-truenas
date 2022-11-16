@@ -274,7 +274,11 @@ func resourceTrueNASDatasetCreate(ctx context.Context, d *schema.ResourceData, m
 	resp, _, err := c.DatasetApi.CreateDataset(ctx).CreateDatasetParams(input).Execute()
 
 	if err != nil {
-		return diag.Errorf("error creating dataset: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error creating dataset: %s\n%s", err, body)
 	}
 
 	d.SetId(resp.Id)
@@ -294,7 +298,11 @@ func resourceTrueNASDatasetRead(ctx context.Context, d *schema.ResourceData, m i
 	resp, _, err := c.DatasetApi.GetDataset(ctx, id).Execute()
 
 	if err != nil {
-		return diag.Errorf("error getting dataset: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error getting dataset: %s\n%s", err, body)
 	}
 
 	dpath := newDatasetPath(resp.Id)
@@ -469,7 +477,11 @@ func resourceTrueNASDatasetUpdate(ctx context.Context, d *schema.ResourceData, m
 	_, _, err := c.DatasetApi.UpdateDataset(ctx, d.Id()).UpdateDatasetParams(input).Execute()
 
 	if err != nil {
-		return diag.Errorf("error updating dataset: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error updating dataset: %s\n%s", err, body)
 	}
 
 	log.Printf("[INFO] TrueNAS dataset (%s) updated", d.Id())
@@ -488,7 +500,11 @@ func resourceTrueNASDatasetDelete(ctx context.Context, d *schema.ResourceData, m
 	_, err := c.DatasetApi.DeleteDataset(ctx, id).Execute()
 
 	if err != nil {
-		return diag.Errorf("error deleting dataset: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error deleting dataset: %s\n%s", err, body)
 	}
 
 	log.Printf("[INFO] TrueNAS dataset (%s) deleted", id)

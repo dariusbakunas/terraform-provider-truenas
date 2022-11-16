@@ -31,7 +31,11 @@ func dataSourceTrueNASPoolsRead(ctx context.Context, d *schema.ResourceData, m i
 	pools, _, err := c.PoolApi.ListPools(ctx).Execute()
 
 	if err != nil {
-		return diag.FromErr(err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error getting pool ids: %s\n%s", err, body)
 	}
 
 	converted := flattenPoolsResponse(pools)

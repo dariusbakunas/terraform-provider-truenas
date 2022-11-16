@@ -100,7 +100,11 @@ func dataSourceTrueNASNetworkConfigurationRead(ctx context.Context, d *schema.Re
 	config, _, err := c.NetworkApi.GetNetworkConfiguration(ctx).Execute()
 
 	if err != nil {
-		return diag.Errorf("error getting network configuration: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error getting network configuration: %s\n%s", err, body)
 	}
 
 	if config.Hostname != nil {
@@ -140,7 +144,7 @@ func dataSourceTrueNASNetworkConfigurationRead(ctx context.Context, d *schema.Re
 	}
 
 	if config.NetwaitIp != nil {
-		if err := d.Set("netwait_ips", flattenStringList(*config.NetwaitIp)); err != nil {
+		if err := d.Set("netwait_ips", flattenStringList(config.NetwaitIp)); err != nil {
 			return diag.Errorf("error setting netwait_ips: %s", err)
 		}
 	}

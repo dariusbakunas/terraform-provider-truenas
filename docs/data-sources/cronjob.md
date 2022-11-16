@@ -25,10 +25,6 @@ data "truenas_cronjob" "job" {
 
 - `cronjob_id` (String) Cronjob ID
 
-### Optional
-
-- `id` (String) The ID of this resource.
-
 ### Read-Only
 
 - `command` (String) Command or script that runs on schedule
@@ -36,6 +32,7 @@ data "truenas_cronjob" "job" {
 - `enabled` (Boolean) `true` if cronjob is enabled
 - `hide_stderr` (Boolean) if `false` any error output is mailed to the user account used to run the command
 - `hide_stdout` (Boolean) if `false` any standard output is mailed to the user account used to run the command
+- `id` (String) The ID of this resource.
 - `schedule` (List of Object) Cronjob schedule (see [below for nested schema](#nestedatt--schedule))
 - `user` (String) Account that is used to run the job
 

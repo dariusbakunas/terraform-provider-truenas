@@ -63,6 +63,11 @@ func dataSourceTrueNASVM() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 			},
+			"time": &schema.Schema{
+				Description: "VM system time. Default is `Local`",
+				Type:        schema.TypeString,
+				Computed:	 true,
+			},
 			"device": &schema.Schema{
 				Type:     schema.TypeSet,
 				Computed: true,
@@ -80,6 +85,11 @@ func dataSourceTrueNASVM() *schema.Resource {
 						},
 						"order": &schema.Schema{
 							Description: "Device order",
+							Type:        schema.TypeInt,
+							Computed:    true,
+						},
+						"vm": &schema.Schema{
+							Description: "Device VM ID",
 							Type:        schema.TypeInt,
 							Computed:    true,
 						},
@@ -130,7 +140,11 @@ func dataSourceTrueNASVMRead(ctx context.Context, d *schema.ResourceData, m inte
 	resp, _, err := c.VmApi.GetVM(ctx, int32(id)).Execute()
 
 	if err != nil {
-		return diag.Errorf("error getting VM: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error getting VM: %s\n%s", err, body)
 	}
 
 	d.Set("name", resp.Name)
@@ -167,8 +181,12 @@ func dataSourceTrueNASVMRead(ctx context.Context, d *schema.ResourceData, m inte
 		d.Set("shutdown_timeout", *resp.ShutdownTimeout)
 	}
 
+	if resp.Time != nil {
+		d.Set("time", *resp.Time)
+	}
+
 	if resp.Devices != nil {
-		if err := d.Set("device", flattenVMDevices(*resp.Devices)); err != nil {
+		if err := d.Set("device", flattenVMDevices(resp.Devices)); err != nil {
 			return diag.Errorf("error setting VM devices: %s", err)
 		}
 	}
@@ -184,21 +202,25 @@ func dataSourceTrueNASVMRead(ctx context.Context, d *schema.ResourceData, m inte
 	return diags
 }
 
-func flattenVMDevices(d []api.VMDevices) []interface{} {
+func flattenVMDevices(d []api.VMDevice) []interface{} {
 	res := make([]interface{}, len(d))
 
 	for i, d := range d {
 		device := map[string]interface{}{}
 
-		device["id"] = strconv.Itoa(int(d.Id))
+		device["id"] = strconv.Itoa(int(*d.Id))
 		device["type"] = d.Dtype
 
 		if d.Order != nil {
 			device["order"] = *d.Order
 		}
 
+		if d.Vm != nil {
+			device["vm"] = *d.Vm
+		}
+
 		if d.Attributes != nil {
-			device["attributes"] = flattenVMDeviceAttributes(*d.Attributes)
+			device["attributes"] = flattenVMDeviceAttributes(d.Attributes)
 		}
 
 		res[i] = device

@@ -157,7 +157,7 @@ func testAccCheckTruenasShareSMBResourceExists(n string, share *api.ShareSMB) re
 			return fmt.Errorf("smb share not found")
 		}
 
-		*share = resp
+		share = resp
 		return nil
 	}
 }
@@ -181,11 +181,11 @@ func testAccCheckTruenasShareSMBResourceAttributes(t *testing.T, n string, share
 		}
 
 		// order does not matter
-		if !assert.ElementsMatch(t, *share.Hostsallow, []string{"10.1.0.1/24", "foo.bar.baz"}) {
+		if !assert.ElementsMatch(t, share.Hostsallow, []string{"10.1.0.1/24", "foo.bar.baz"}) {
 			return fmt.Errorf("remote hostsallow list for smb share does not match expected")
 		}
 
-		if !assert.ElementsMatch(t, *share.Hostsdeny, []string{"ALL"}) {
+		if !assert.ElementsMatch(t, share.Hostsdeny, []string{"ALL"}) {
 			return fmt.Errorf("remote hostsdeny list for smb share does not match expected")
 		}
 

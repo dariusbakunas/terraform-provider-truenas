@@ -157,7 +157,11 @@ func dataSourceTrueNASShareSMBRead(ctx context.Context, d *schema.ResourceData, 
 	resp, _, err := c.SharingApi.GetShareSMB(ctx, int32(id)).Execute()
 
 	if err != nil {
-		return diag.Errorf("error getting share: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error getting share: %s\n%s", err, body)
 	}
 
 	d.Set("path", resp.Path)
@@ -175,13 +179,13 @@ func dataSourceTrueNASShareSMBRead(ctx context.Context, d *schema.ResourceData, 
 	}
 
 	if resp.Hostsallow != nil {
-		if err := d.Set("hostsallow", flattenStringList(*resp.Hostsallow)); err != nil {
+		if err := d.Set("hostsallow", flattenStringList(resp.Hostsallow)); err != nil {
 			return diag.Errorf("error setting hostsallow: %s", err)
 		}
 	}
 
 	if resp.Hostsdeny != nil {
-		if err := d.Set("hostsdeny", flattenStringList(*resp.Hostsdeny)); err != nil {
+		if err := d.Set("hostsdeny", flattenStringList(resp.Hostsdeny)); err != nil {
 			return diag.Errorf("error setting hostsdeny: %s", err)
 		}
 	}

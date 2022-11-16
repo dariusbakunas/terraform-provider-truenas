@@ -94,7 +94,11 @@ func dataSourceTrueNASCronjobRead(ctx context.Context, d *schema.ResourceData, m
 	resp, _, err := c.CronjobApi.GetCronJob(ctx, int32(id)).Execute()
 
 	if err != nil {
-		return diag.Errorf("error getting cronjob: %s", err)
+		var body []byte
+		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
+			body = apiErr.Body()
+		}
+		return diag.Errorf("error getting cronjob: %s\n%s", err, body)
 	}
 
 	if resp.User != nil {
