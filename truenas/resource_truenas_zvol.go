@@ -18,6 +18,9 @@ func resourceTrueNASZVOL() *schema.Resource {
 		ReadContext:   resourceTrueNASZVOLRead,
 		UpdateContext: resourceTrueNASZVOLUpdate,
 		DeleteContext: resourceTrueNASZVOLDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 		Schema: map[string]*schema.Schema{
 			"zvol_id": &schema.Schema{
 				Type:     schema.TypeString,

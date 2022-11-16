@@ -100,4 +100,13 @@ Optional:
 - `delete` (String)
 - `update` (String)
 
+## Import
 
+Import is supported using the following syntax:
+
+```shell
+terraform import truenas_dataset.default {{dataset_id}}
+
+# Example:
+terraform import truenas_dataset.default "Tank/test_nfs"
+```

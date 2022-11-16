@@ -38,6 +38,7 @@ data "truenas_vm" "vm" {
 - `shutdown_timeout` (Number) Shutdown timeout in seconds
 - `status` (Set of Object) (see [below for nested schema](#nestedatt--status))
 - `threads` (Number) Number of CPU threads
+- `time` (String) VM system time. Default is `Local`
 - `vcpus` (Number) Number of virtual CPUs
 
 <a id="nestedatt--device"></a>
@@ -49,6 +50,7 @@ Read-Only:
 - `id` (String)
 - `order` (Number)
 - `type` (String)
+- `vm` (Number)
 
 
 <a id="nestedatt--status"></a>

@@ -15,6 +15,9 @@ func resourceTrueNASVM() *schema.Resource {
 		CreateContext: resourceTrueNASVMCreate,
 		DeleteContext: resourceTrueNASVMDelete,
 		UpdateContext: resourceTrueNASVMUpdate,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 		Schema: map[string]*schema.Schema{
 			"vm_id": &schema.Schema{
 				Description: "VM ID",

@@ -17,6 +17,9 @@ func resourceTrueNASShareNFS() *schema.Resource {
 		ReadContext:   resourceTrueNASShareNFSRead,
 		UpdateContext: resourceTrueNASShareNFSUpdate,
 		DeleteContext: resourceTrueNASShareNFSDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 		Schema: map[string]*schema.Schema{
 			"sharenfs_id": &schema.Schema{
 				Description: "NFS Share ID",
