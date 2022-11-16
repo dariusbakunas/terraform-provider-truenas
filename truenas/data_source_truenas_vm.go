@@ -66,7 +66,7 @@ func dataSourceTrueNASVM() *schema.Resource {
 			"time": &schema.Schema{
 				Description: "VM system time. Default is `Local`",
 				Type:        schema.TypeString,
-				Computed:	 true,
+				Computed:    true,
 			},
 			"device": &schema.Schema{
 				Type:     schema.TypeSet,
