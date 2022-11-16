@@ -191,6 +191,10 @@ func resourceTrueNASVMRead(ctx context.Context, d *schema.ResourceData, m interf
 		d.Set("shutdown_timeout", *resp.ShutdownTimeout)
 	}
 
+	if resp.Time != nil {
+		d.Set("time", *resp.Time)
+	}
+
 	if resp.Devices != nil {
 		if err := d.Set("device", flattenVMDevices(resp.Devices)); err != nil {
 			return diag.Errorf("error setting VM devices: %s", err)

@@ -63,6 +63,11 @@ func dataSourceTrueNASVM() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 			},
+			"time": &schema.Schema{
+				Description: "VM system time. Default is `Local`",
+				Type:        schema.TypeString,
+				Computed:	 true,
+			},
 			"device": &schema.Schema{
 				Type:     schema.TypeSet,
 				Computed: true,
@@ -80,6 +85,11 @@ func dataSourceTrueNASVM() *schema.Resource {
 						},
 						"order": &schema.Schema{
 							Description: "Device order",
+							Type:        schema.TypeInt,
+							Computed:    true,
+						},
+						"vm": &schema.Schema{
+							Description: "Device VM ID",
 							Type:        schema.TypeInt,
 							Computed:    true,
 						},
@@ -169,6 +179,10 @@ func dataSourceTrueNASVMRead(ctx context.Context, d *schema.ResourceData, m inte
 
 	if resp.ShutdownTimeout != nil {
 		d.Set("shutdown_timeout", *resp.ShutdownTimeout)
+	}
+
+	if resp.Time != nil {
+		d.Set("time", *resp.Time)
 	}
 
 	if resp.Devices != nil {
