@@ -55,6 +55,9 @@ func resourceTrueNASDataset() *schema.Resource {
 		ReadContext:   resourceTrueNASDatasetRead,
 		UpdateContext: resourceTrueNASDatasetUpdate,
 		DeleteContext: resourceTrueNASDatasetDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(4 * time.Minute),
 			Update: schema.DefaultTimeout(4 * time.Minute),

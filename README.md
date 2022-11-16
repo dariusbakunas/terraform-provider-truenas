@@ -4,13 +4,19 @@
 
 # Terraform Provider for TrueNAS
 
-Still in early development, check `examples` folder for working examples
+Check `examples` folder for working examples
 
 ## Documentation
 
 Full documentation is available on the Terraform website:
 
 https://registry.terraform.io/providers/dariusbakunas/truenas/latest/docs
+
+To generate provider documentation:
+
+```bash
+go generate
+```
 
 ## Development
 
