@@ -15,6 +15,9 @@ func resourceTrueNASCronjob() *schema.Resource {
 		ReadContext:   resourceTrueNASCronjobRead,
 		UpdateContext: resourceTrueNASCronjobUpdate,
 		DeleteContext: resourceTrueNASCronjobDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 		Schema: map[string]*schema.Schema{
 			"cronjob_id": &schema.Schema{
 				Description: "Cronjob ID",

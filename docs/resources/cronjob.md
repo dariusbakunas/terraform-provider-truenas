@@ -59,4 +59,10 @@ Optional:
 - `minute` (String)
 - `month` (String)
 
+## Import
 
+Import is supported using the following syntax:
+
+```shell
+terraform import truenas_cronjob.default {{cronjob_id}}
+```
