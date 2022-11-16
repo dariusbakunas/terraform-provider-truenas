@@ -57,4 +57,21 @@ release:
   # If you want to manually examine the release before its live, uncomment this line:
   # draft: true
 changelog:
-  skip: true
+  use: github
+  filters:
+    exclude:
+      - Merge pull request
+      - Merge remote-tracking branch
+      - Merge branch
+  groups:
+    -
+      title: 'New Features'
+      regexp: "^.*feat[(\\w)]*:+.*$"
+      order: 0
+    -
+      title: 'Bug fixes'
+      regexp: "^.*fix[(\\w)]*:+.*$"
+      order: 10
+    -
+      title: Other work
+      order: 999
