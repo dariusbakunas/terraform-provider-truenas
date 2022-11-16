@@ -105,7 +105,7 @@ Optional:
 Import is supported using the following syntax:
 
 ```shell
-terraform import truenas_dataset.default {{datsset_id}}
+terraform import truenas_dataset.default {{dataset_id}}
 
 # Example:
 tf import truenas_dataset.default "Tank/test_nfs"

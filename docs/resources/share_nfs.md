@@ -66,4 +66,13 @@ resource "truenas_share_nfs" "nfs" {
 - `id` (String) The ID of this resource.
 - `sharenfs_id` (Number) NFS Share ID
 
+## Import
 
+Import is supported using the following syntax:
+
+```shell
+terraform import truenas_share_nfs.default {{nfs_share_id}}
+
+# Example:
+tf import truenas_share_nfs.default "14"
+```
