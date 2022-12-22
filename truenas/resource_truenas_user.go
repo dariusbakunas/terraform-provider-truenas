@@ -181,7 +181,7 @@ func resourceTrueNASUserRead(ctx context.Context, d *schema.ResourceData, m inte
 	}
 
 	if resp.Home != nil {
-		d.Set("home", *resp.Home)
+		d.Set("home_directory", *resp.Home)
 	}
 
 	if resp.Locked != nil {
@@ -204,8 +204,12 @@ func resourceTrueNASUserRead(ctx context.Context, d *schema.ResourceData, m inte
 		d.Set("smb", *resp.Smb)
 	}
 
-	if resp.Sshpubkey.IsSet() {
+	if resp.Sshpubkey.IsSet() && resp.Sshpubkey.Get() != nil {
 		d.Set("ssh_public_key", strings.TrimSpace(*resp.Sshpubkey.Get()))
+	}
+
+	if resp.Sudo != nil {
+		d.Set("sudo", *resp.Sudo)
 	}
 
 	if resp.SudoCommands != nil {
@@ -214,10 +218,6 @@ func resourceTrueNASUserRead(ctx context.Context, d *schema.ResourceData, m inte
 
 	if resp.SudoNopasswd != nil {
 		d.Set("sudo_no_password", *resp.SudoNopasswd)
-	}
-
-	if resp.Sudo != nil {
-		d.Set("sudo", *resp.Sudo)
 	}
 
 	if resp.Uid != nil {
