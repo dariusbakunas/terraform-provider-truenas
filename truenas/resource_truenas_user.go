@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"log"
 	"strconv"
+	"strings"
 )
 
 func resourceTrueNASUser() *schema.Resource {
@@ -204,7 +205,7 @@ func resourceTrueNASUserRead(ctx context.Context, d *schema.ResourceData, m inte
 	}
 
 	if resp.Sshpubkey.IsSet() {
-		d.Set("ssh_public_key", resp.Sshpubkey.Get())
+		d.Set("ssh_public_key", strings.TrimSpace(*resp.Sshpubkey.Get()))
 	}
 
 	if resp.SudoCommands != nil {
@@ -429,7 +430,7 @@ func expandUserCreate(ctx context.Context, d *schema.ResourceData, m interface{}
 	}
 
 	if sshPublicKey, ok := d.GetOk("ssh_public_key"); ok {
-		input.Sshpubkey.Set(getStringPtr(sshPublicKey.(string)))
+		input.Sshpubkey.Set(getStringPtr(strings.TrimSpace(sshPublicKey.(string))))
 	}
 
 	if groupIds, ok := d.GetOk("group_ids"); ok {
@@ -548,7 +549,7 @@ func expandUserUpdate(ctx context.Context, d *schema.ResourceData, m interface{}
 	}
 
 	if sshPublicKey, ok := d.GetOk("ssh_public_key"); ok {
-		input.Sshpubkey.Set(getStringPtr(sshPublicKey.(string)))
+		input.Sshpubkey.Set(getStringPtr(strings.TrimSpace(sshPublicKey.(string))))
 	}
 
 	if d.HasChange("group_ids") {
