@@ -2,9 +2,11 @@ package truenas
 
 import (
 	"context"
-	api "github.com/dariusbakunas/truenas-go-sdk"
+	"github.com/dariusbakunas/truenas-go-sdk/angelfish"
+	"github.com/dariusbakunas/truenas-go-sdk/bluefin"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"golang.org/x/oauth2"
 )
 
@@ -30,6 +32,12 @@ func Provider() *schema.Provider {
 				Optional:    true,
 				Description: "DEBUG: dump all API requests/responses",
 				DefaultFunc: schema.EnvDefaultFunc("TRUENAS_DEBUG", false),
+			},
+			"truenas_release": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      "angelfish",
+				ValidateFunc: validation.StringInSlice([]string{"angelfish", "bluefin"}, false),
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
@@ -68,15 +76,32 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 	)
 	tc := oauth2.NewClient(ctx, ts)
 
-	config := api.NewConfiguration()
-	config.Servers = api.ServerConfigurations{
-		{
-			URL: baseURL,
-		},
-	}
-	config.Debug = debug
-	config.HTTPClient = tc
+	switch release := d.Get("truenas_release").(string); release {
+	case "angelfish":
+		config := angelfish.NewConfiguration()
+		config.Servers = angelfish.ServerConfigurations{
+			{
+				URL: baseURL,
+			},
+		}
+		config.Debug = debug
+		config.HTTPClient = tc
 
-	c := api.NewAPIClient(config)
-	return c, diags
+		c := angelfish.NewAPIClient(config)
+		return c, diags
+	case "bluefin":
+		config := bluefin.NewConfiguration()
+		config.Servers = bluefin.ServerConfigurations{
+			{
+				URL: baseURL,
+			},
+		}
+		config.Debug = debug
+		config.HTTPClient = tc
+
+		c := bluefin.NewAPIClient(config)
+		return c, diags
+	default:
+		return nil, diag.Errorf("Unknown TrueNAS release setting: %s", release)
+	}
 }
