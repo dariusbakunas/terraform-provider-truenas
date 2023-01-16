@@ -2,7 +2,7 @@ module github.com/dariusbakunas/terraform-provider-truenas
 
 go 1.18
 
-//replace github.com/dariusbakunas/truenas-go-sdk => /Users/darius/Programming/truenas-go-sdk
+replace github.com/dariusbakunas/truenas-go-sdk => /Users/darius/Programming/truenas-go-sdk
 
 require (
 	github.com/dariusbakunas/truenas-go-sdk v0.9.0

@@ -3,7 +3,7 @@ package truenas
 import (
 	"context"
 	"fmt"
-	api "github.com/dariusbakunas/truenas-go-sdk"
+	"github.com/dariusbakunas/terraform-provider-truenas/client"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"strconv"
@@ -130,21 +130,17 @@ func dataSourceTrueNASVM() *schema.Resource {
 func dataSourceTrueNASVMRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	c := m.(*api.APIClient)
+	api := client.VmApi{Client: m}
 	id, err := strconv.Atoi(d.Get("vm_id").(string))
 
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	resp, _, err := c.VmApi.GetVM(ctx, int32(id)).Execute()
+	resp, dErr := api.GetVM(ctx, id)
 
-	if err != nil {
-		var body []byte
-		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
-			body = apiErr.Body()
-		}
-		return diag.Errorf("error getting VM: %s\n%s", err, body)
+	if dErr != nil {
+		return dErr
 	}
 
 	d.Set("name", resp.Name)
@@ -202,7 +198,7 @@ func dataSourceTrueNASVMRead(ctx context.Context, d *schema.ResourceData, m inte
 	return diags
 }
 
-func flattenVMDevices(d []api.VMDevice) []interface{} {
+func flattenVMDevices(d []client.VMDevice) []interface{} {
 	res := make([]interface{}, len(d))
 
 	for i, d := range d {
@@ -241,7 +237,7 @@ func flattenVMDeviceAttributes(a map[string]interface{}) map[string]string {
 	return res
 }
 
-func flattenVMStatus(s api.VMStatus) []interface{} {
+func flattenVMStatus(s client.VMStatus) []interface{} {
 	var res []interface{}
 
 	status := map[string]interface{}{}

@@ -2,7 +2,7 @@ package truenas
 
 import (
 	"context"
-	api "github.com/dariusbakunas/truenas-go-sdk"
+	"github.com/dariusbakunas/terraform-provider-truenas/client"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
@@ -85,8 +85,9 @@ func resourceTrueNASVM() *schema.Resource {
 				Default:     "536870912", // 512MiB
 			},
 			"device": &schema.Schema{
-				Type:     schema.TypeSet,
-				Optional: true,
+				Type:        schema.TypeSet,
+				Description: "List of VM devices. Use separate devices resource for Bluefin and newer releases",
+				Optional:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"id": &schema.Schema{
@@ -146,7 +147,7 @@ func resourceTrueNASVM() *schema.Resource {
 }
 
 func resourceTrueNASVMRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*api.APIClient)
+	api := client.VmApi{Client: m}
 
 	id, err := strconv.Atoi(d.Id())
 
@@ -154,10 +155,10 @@ func resourceTrueNASVMRead(ctx context.Context, d *schema.ResourceData, m interf
 		return diag.FromErr(err)
 	}
 
-	resp, _, err := c.VmApi.GetVM(ctx, int32(id)).Execute()
+	resp, dErr := api.GetVM(ctx, id)
 
-	if err != nil {
-		return diag.Errorf("error getting VM: %s", err)
+	if dErr != nil {
+		return dErr
 	}
 
 	d.Set("name", resp.Name)
@@ -215,9 +216,9 @@ func resourceTrueNASVMRead(ctx context.Context, d *schema.ResourceData, m interf
 }
 
 func resourceTrueNASVMCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*api.APIClient)
+	api := client.VmApi{Client: m}
 
-	input := api.CreateVMParams{
+	input := client.CreateVMParams{
 		Name: getStringPtr(d.Get("name").(string)),
 	}
 
@@ -267,14 +268,10 @@ func resourceTrueNASVMCreate(ctx context.Context, d *schema.ResourceData, m inte
 		input.Devices = dv
 	}
 
-	resp, _, err := c.VmApi.CreateVM(ctx).CreateVMParams(input).Execute()
+	resp, err := api.CreateVM(ctx, input)
 
 	if err != nil {
-		var body []byte
-		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
-			body = apiErr.Body()
-		}
-		return diag.Errorf("error creating VM: %s\n%s", err, body)
+		return err
 	}
 
 	d.SetId(strconv.Itoa(int(resp.Id)))
@@ -282,7 +279,7 @@ func resourceTrueNASVMCreate(ctx context.Context, d *schema.ResourceData, m inte
 }
 
 func resourceTrueNASVMDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*api.APIClient)
+	api := client.VmApi{Client: m}
 
 	id, err := strconv.Atoi(d.Id())
 
@@ -290,15 +287,10 @@ func resourceTrueNASVMDelete(ctx context.Context, d *schema.ResourceData, m inte
 		return diag.FromErr(err)
 	}
 
-	_, err = c.VmApi.DeleteVM(ctx, int32(id)).Execute()
+	dErr := api.DeleteVM(ctx, int32(id))
 
-	if err != nil {
-		var body []byte
-		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
-			body = apiErr.Body()
-		}
-
-		return diag.Errorf("error deleting VM: %s\n%s", err, body)
+	if dErr != nil {
+		return dErr
 	}
 
 	d.SetId("")
@@ -307,7 +299,7 @@ func resourceTrueNASVMDelete(ctx context.Context, d *schema.ResourceData, m inte
 }
 
 func resourceTrueNASVMUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	c := m.(*api.APIClient)
+	api := client.VmApi{Client: m}
 
 	id, err := strconv.Atoi(d.Id())
 
@@ -315,7 +307,7 @@ func resourceTrueNASVMUpdate(ctx context.Context, d *schema.ResourceData, m inte
 		return diag.FromErr(err)
 	}
 
-	input := api.UpdateVMParams{
+	input := client.UpdateVMParams{
 		Name: getStringPtr(d.Get("name").(string)),
 	}
 
@@ -363,25 +355,10 @@ func resourceTrueNASVMUpdate(ctx context.Context, d *schema.ResourceData, m inte
 		}
 	}
 
-	_, _, err = c.VmApi.UpdateVM(ctx, int32(id)).UpdateVMParams(input).Execute()
+	_, dErr := api.UpdateVM(ctx, int32(id), input)
 
-	// TODO: handle error response like:
-	//{{
-	//	"vm_update.name": [
-	//{
-	//"message": "Only alphanumeric characters are allowed.",
-	//"errno": 22
-	//}
-	//]
-	//}}
-
-	if err != nil {
-		var body []byte
-		if apiErr, ok := err.(*api.GenericOpenAPIError); ok {
-			body = apiErr.Body()
-		}
-
-		return diag.Errorf("error updating VM: %s\n%s", err, body)
+	if dErr != nil {
+		return dErr
 	}
 
 	return resourceTrueNASVMRead(ctx, d, m)
@@ -389,12 +366,12 @@ func resourceTrueNASVMUpdate(ctx context.Context, d *schema.ResourceData, m inte
 
 // TrueNAS api requires vm attribute set on updates even if it is new device
 // while that attribute cannot be set during creation (bug?)
-func expandVMDeviceForUpdate(d []interface{}, vmID *int32) ([]api.VMDevice, error) {
+func expandVMDeviceForUpdate(d []interface{}, vmID *int32) ([]client.VMDevice, error) {
 	if len(d) == 0 {
-		return []api.VMDevice{}, nil
+		return []client.VMDevice{}, nil
 	}
 
-	result := make([]api.VMDevice, 0, len(d))
+	result := make([]client.VMDevice, 0, len(d))
 
 	for _, item := range d {
 		dMap := item.(map[string]interface{})
@@ -404,7 +381,7 @@ func expandVMDeviceForUpdate(d []interface{}, vmID *int32) ([]api.VMDevice, erro
 			continue
 		}
 
-		device := &api.VMDevice{
+		device := &client.VMDevice{
 			Dtype: dType,
 		}
 
@@ -448,12 +425,12 @@ func expandVMDeviceForUpdate(d []interface{}, vmID *int32) ([]api.VMDevice, erro
 	return result, nil
 }
 
-func expandVMDevice(d []interface{}) ([]api.VMDevice, error) {
+func expandVMDevice(d []interface{}) ([]client.VMDevice, error) {
 	if len(d) == 0 {
-		return []api.VMDevice{}, nil
+		return []client.VMDevice{}, nil
 	}
 
-	result := make([]api.VMDevice, 0, len(d))
+	result := make([]client.VMDevice, 0, len(d))
 
 	for _, item := range d {
 		dMap := item.(map[string]interface{})
@@ -463,7 +440,7 @@ func expandVMDevice(d []interface{}) ([]api.VMDevice, error) {
 			continue
 		}
 
-		device := &api.VMDevice{
+		device := &client.VMDevice{
 			Dtype: dType,
 		}
 
