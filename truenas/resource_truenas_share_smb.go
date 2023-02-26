@@ -327,6 +327,14 @@ func expandShareSMB(d *schema.ResourceData) (api.CreateShareSMBParams, error) {
 		share.Purpose = getStringPtr(purpose.(string))
 	}
 
+	if name, ok := d.GetOk("name"); ok {
+		err := isParamLocked("Name", &share)
+		if err != nil {
+			return share, err
+		}
+		share.Name = getStringPtr(name.(string))
+	}
+
 	if path_suffix, ok := d.GetOk("path_suffix"); ok {
 		err := isParamLocked("PathSuffix", &share)
 		if err != nil {
@@ -377,14 +385,6 @@ func expandShareSMB(d *schema.ResourceData) (api.CreateShareSMBParams, error) {
 			return share, err
 		}
 		share.Timemachine = getBoolPtr(timemachine.(bool))
-	}
-
-	if name, ok := d.GetOk("name"); ok {
-		err := isParamLocked("Name", &share)
-		if err != nil {
-			return share, err
-		}
-		share.Name = getStringPtr(name.(string))
 	}
 
 	ro := d.Get("ro")
