@@ -44,7 +44,7 @@ To test new binary, create `.terraformrc` in your home folder, with contents:
 ```terraform
 provider_installation {
 	dev_overrides {
-    	"registry.terraform.io/dariusbakunas/terraform" = "<local path to cloned provider repo>"
+    	"registry.terraform.io/dariusbakunas/truenas" = "<local path to cloned provider repo>"
   	}
 
   	direct {}
@@ -57,7 +57,7 @@ You will get a warning next time you run terraform:
 │ Warning: Provider development overrides are in effect
 │ 
 │ The following provider development overrides are set in the CLI configuration:
-│  - dariusbakunas/terraform in <...>/terraform-provider-terraform
+│  - dariusbakunas/truenas in <...>/terraform-provider-truenas
 │ 
 │ The behavior may therefore not match any released version of the provider and applying changes may cause the state to become incompatible with published releases.
 ╵
