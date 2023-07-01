@@ -121,3 +121,72 @@ Provider started, to attach Terraform set the TF_REATTACH_PROVIDERS env var:
 ```
 
 Copy the line starting with `TF_REATTACH_PROVIDERS` from your provider's output. Either export it, or prefix every Terraform command with it. Run Terraform as usual. Any breakpoints you have set will halt execution and show you the current variable values.
+
+### VirtualBox Python Testing Suite
+
+To avoid risks with testing directly on existing TrueNAS instances, a python-based virtualbox testing suite is provided.
+
+#### Dependencies
+
+To use this suite, you must have installed
+- VirtualBox
+- python3, with packages:
+  - mypy
+  - paramiko
+  - requests
+  - scp
+
+#### One-time setup
+
+First, a pre-installed VM must be created:
+```
+$ python3 tests/create_base_test_vm.py
+```
+The script will give detailed (albeit simple) instructions that the user must do manually. This is because there is no good automated installer available for TrueNAS.
+
+Once complete, a new VM `truenas-test-base` will exist, which will be cloned by test classes.
+
+#### Running the tests
+
+The tests can be run easily through pytest:
+```
+$ python3 -m pytest
+```
+NOTE: The tests will take at least a few minutes **per test class**, so be patient. This is because each test class needs a fresh VM, and the VM itself takes about a minute to fully start up.
+
+WARNING: There appear to be some intermittent bugs, for example they sometimes fail with:
+```
+E           Exception: Failed to find base dataset-pool dataset
+```
+This is likely due to poor exception handling and/or retrying. Re-running the tests usually will overcome this issue.
+
+#### How the tests work
+
+The tests work as follows:
+- The test class sets up a clone of the base VM
+  - Clones the base VM
+  - Optionally runs some test-specific VirtualBox setup commands
+  - Starts the VM
+  - Waits for SSH to become available
+  - Uses SSH to login and create an API key
+  - Optionally runs some test-specific TrueNAS API setup commands
+  - Creates a temp dir for terraform files
+  - Writes `main.tf` and validates that `terraform init/plan/apply` all work
+- Each test runs:
+  - Creates .tf files
+  - Runs `terraform apply`
+  - Validates results using TrueNAS API
+  - On failure, marks VM (for class) as borked, as it may not have cleaned up correctly
+  - On tearDown, runs `terraform destroy`
+- The test class tears everything down
+  - Deletes the temp dir where the .tf files live
+  - Runs a hard-stop on the VM
+  - Destroys the VM along with any attached drives
+
+#### Code Quality
+
+The code is linted using the `mypy` python package:
+```
+$ python3 -m mypy .
+Success: no issues found in 9 source files
+```
