@@ -39,6 +39,8 @@ func Provider() *schema.Provider {
 			"truenas_share_smb": resourceTrueNASShareSMB(),
 			"truenas_zvol":      resourceTrueNASZVOL(),
 			"truenas_vm":        resourceTrueNASVM(),
+			"truenas_group":     resourceTrueNASGroup(),
+			"truenas_user":      resourceTrueNASUser(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"truenas_cronjob":               dataSourceTrueNASCronjob(),

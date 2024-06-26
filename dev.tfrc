@@ -1,0 +1,9 @@
+
+disable_checkpoint = true
+
+provider_installation {
+  dev_overrides {
+    "registry.terraform.io/jdella/truenas" = "C:/Users/jdella/Desktop/projects/terraform-provider-truenas" // the directory where the binary was built.
+  }
+  direct {}
+}

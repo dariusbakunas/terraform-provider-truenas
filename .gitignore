@@ -9,6 +9,10 @@
 *.dll
 *.so
 *.dylib
+*.ps1
+*.tfstate
+terraform.tfstate
+*.exe
 
 # Test binary, built with `go test -c`
 *.test
