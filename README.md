@@ -10,7 +10,7 @@ Check `examples` folder for working examples
 
 Full documentation is available on the Terraform website:
 
-https://registry.terraform.io/providers/dariusbakunas/truenas/latest/docs
+https://registry.terraform.io/providers/jdella/truenas/latest/docs
 
 To generate provider documentation:
 
@@ -30,7 +30,7 @@ go generate
 First, clone the repository:
 
 ```bash
-git clone git@github.com:dariusbakunas/terraform-provider-truenas.git
+git clone git@github.com:jdella/terraform-provider-truenas.git
 ```
 
 To compile the provider, run make build. This will build the provider and put the provider binary in the current directory.
@@ -44,7 +44,7 @@ To test new binary, create `.terraformrc` in your home folder, with contents:
 ```terraform
 provider_installation {
 	dev_overrides {
-    	"registry.terraform.io/dariusbakunas/terraform" = "<local path to cloned provider repo>"
+    	"registry.terraform.io/jdella/terraform" = "<local path to cloned provider repo>"
   	}
 
   	direct {}
@@ -57,7 +57,7 @@ You will get a warning next time you run terraform:
 │ Warning: Provider development overrides are in effect
 │ 
 │ The following provider development overrides are set in the CLI configuration:
-│  - dariusbakunas/terraform in <...>/terraform-provider-terraform
+│  - jdella/terraform in <...>/terraform-provider-terraform
 │ 
 │ The behavior may therefore not match any released version of the provider and applying changes may cause the state to become incompatible with published releases.
 ╵
@@ -117,7 +117,7 @@ Have it continue execution and it will print output like the following to stdout
 ```bash
 Provider started, to attach Terraform set the TF_REATTACH_PROVIDERS env var:
 
-        TF_REATTACH_PROVIDERS='{"dariusbakunas/truenas":{"Protocol":"grpc","Pid":30101,"Test":true,"Addr":{"Network":"unix","String":"/var/folders/mq/00hw97gj08323ybqfm763plr0000gn/T/plugin900766792"}}}'
+        TF_REATTACH_PROVIDERS='{"jdella/truenas":{"Protocol":"grpc","Pid":30101,"Test":true,"Addr":{"Network":"unix","String":"/var/folders/mq/00hw97gj08323ybqfm763plr0000gn/T/plugin900766792"}}}'
 ```
 
 Copy the line starting with `TF_REATTACH_PROVIDERS` from your provider's output. Either export it, or prefix every Terraform command with it. Run Terraform as usual. Any breakpoints you have set will halt execution and show you the current variable values.

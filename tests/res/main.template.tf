@@ -2,8 +2,8 @@ terraform {
   required_providers {
     # TrueNas API
     truenas = {
-      #source = "dariusbakunas/truenas"  # <-- online version?
-      source = "dariusbakunas/providers/truenas"  # <-- local installed version
+      #source = "jdella/truenas"  # <-- online version?
+      source = "jdella/providers/truenas"  # <-- local installed version
       version = "0.77.1"
     }
   }

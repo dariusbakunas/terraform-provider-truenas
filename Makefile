@@ -1,5 +1,5 @@
 TEST?=$$(go list ./... | grep -v 'vendor')
-HOSTNAME=dariusbakunas
+HOSTNAME=dellathefella
 NAMESPACE=providers
 NAME=truenas
 BINARY=terraform-provider-${NAME}

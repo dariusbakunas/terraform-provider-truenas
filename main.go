@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"flag"
-	"github.com/dariusbakunas/terraform-provider-truenas/truenas"
+	"github.com/dellathefella/terraform-provider-truenas/truenas"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
 	"log"
@@ -24,7 +24,7 @@ func main() {
 	}
 
 	if debugMode {
-		err := plugin.Debug(context.Background(), "dariusbakunas/truenas", opts)
+		err := plugin.Debug(context.Background(), "jdella/truenas", opts)
 		if err != nil {
 			log.Fatal(err.Error())
 		}

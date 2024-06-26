@@ -3,7 +3,7 @@ package truenas
 import (
 	"context"
 	"fmt"
-	api "github.com/dariusbakunas/truenas-go-sdk"
+	api "github.com/dellathefella/truenas-go-sdk"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"

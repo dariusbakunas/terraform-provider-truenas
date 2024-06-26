@@ -2,7 +2,7 @@ package truenas
 
 import (
 	"context"
-	api "github.com/dariusbakunas/truenas-go-sdk"
+	api "github.com/dellathefella/truenas-go-sdk"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
@@ -181,7 +181,7 @@ func resourceTrueNASGroupUpdate(ctx context.Context, d *schema.ResourceData, m i
 		return diag.FromErr(err)
 	}
 
-	// Uses the create group API object - https://github.com/dariusbakunas/truenas-go-sdk/blob/main/docs/GroupApi.md#updategroup
+	// Uses the create group API object - https://github.com/dellathefella/truenas-go-sdk/blob/main/docs/GroupApi.md#updategroup
 	input := expandGroup(d)
 
 	_, _, err = c.GroupApi.UpdateGroup(ctx, int32(id)).CreateGroupParams(input).Execute()
