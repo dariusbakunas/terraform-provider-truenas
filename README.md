@@ -2,6 +2,8 @@
     <img src="https://raw.githubusercontent.com/hashicorp/terraform-website/master/content/source/assets/images/logo-terraform-main.svg" alt="Terraform logo" title="Terraform" align="right" height="50" />
 </a>
 
+Archiving this as TrueNAS deprecating REST APIs: https://github.com/dariusbakunas/terraform-provider-truenas/issues/25
+
 # Terraform Provider for TrueNAS
 
 Check `examples` folder for working examples
